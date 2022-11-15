@@ -1,0 +1,145 @@
+.card {
+  width: 100%;
+  padding-bottom: 30px;
+  height: 100%;
+  border: none;
+  background-color: transparent;
+
+  &.card--not-full-height {
+    height: auto;
+  }
+}
+
+.card-body {
+  height: 100%;
+
+  @include themify($themes) {
+    background-color: themed('colorBackground');
+  }
+
+  @include borderify($borders) {
+    border-radius: bordered('borderRadius');
+  }
+
+  @include shadowify($shadows) {
+    box-shadow: shadowed('blocksShadows');
+  }
+}
+
+.card__title {
+  margin-bottom: 30px;
+  text-transform: uppercase;
+  position: relative;
+
+  @include directify($directions) {
+    text-align: directed('left');
+  }
+
+  h5.card__title-center {
+    text-align: center;
+  }
+
+  &:not(:first-child) {
+    margin-top: 40px;
+  }
+
+  .subhead {
+    text-transform: none;
+    font-size: 12px;
+    line-height: 18px;
+    opacity: 0.7;
+    margin-top: 3px;
+  }
+
+  * {
+    margin-bottom: 0;
+  }
+
+  h5 {
+    font-size: 13px;
+  }
+}
+
+.blocks-with-shadow-theme {
+
+  .card-body {
+    box-shadow: 0 10px 30px 1px rgba(0, 0, 0, 0.06);
+  }
+}
+
+.financeCard{
+  background-color: #d6ecff;
+}
+
+.primaryLink{
+  padding: 10px;
+    color: white;
+    background-color: #0671ab;
+    border-radius: 5px;
+    margin-bottom: 12px;
+    cursor: pointer;
+}
+.reportButtons{
+  margin-left: auto;
+  margin-right:20px; 
+  margin-top: 20px;
+  margin-bottom: 20px; 
+}
+.client_name{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.wizard__Card{
+  min-height: 630px;
+}
+
+.wizard__step.wizard__step:active{
+  background: #064b88;
+}
+
+.state-select{
+  border-color: rgb(112, 187, 253);
+  border-radius: 4px;
+  padding: 5px;
+  width: 100%;
+}
+
+.excel__download_btn{
+    width: 140px;
+    border: 1px solid #70bbfd;
+    padding: 10px;
+    cursor: pointer;
+}
+.excel__download_btn:hover{
+  background-color: #c5e4ff;
+  color: white;
+  cursor: pointer;
+}
+.header__section{
+  display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.search__input{
+  display: flex;
+    align-items: center;
+}
+
+.steps-content {
+  min-height: 500px;
+  margin-top: 16px;
+  padding: 10px;
+  background-color: #fafafa;
+  border: 1px dashed #414141;
+  border-radius: 2px;
+}
+
+.steps-action {
+  margin-top: 24px;
+}
+
+.anticon{
+  vertical-align: 0em;
+}

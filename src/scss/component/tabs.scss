@@ -1,0 +1,305 @@
+.nav{
+  @include directify($directions) {
+    #{directed('padding-left')}: 10px;
+  }
+}
+.tabs {
+  overflow: auto;
+
+  .tabs__wrap {
+    @include directify($directions) {
+      text-align: directed('left');
+    }
+    min-width: min-content;
+    //-webkit-min-width: min-content;
+  }
+
+  .nav-tabs {
+
+    li {
+
+      .nav-link {
+        padding: 10px 20px;
+        @include directify($directions) {
+          #{directed('margin-right')}: 0px;
+        }
+        transition: background-color 0.3s;
+        cursor: pointer;
+
+        @include themify($themes) {
+          color: themed('colorText');
+        }
+
+        &:hover, &:focus, &:active {
+          outline: none;
+
+          @include themify($themes) {
+            background-color: themed('colorHover');
+            border-color: themed('colorHover');
+            border-bottom-color: $color-dusty-white;
+          }
+        }
+      }
+
+      .nav-link.active, .nav-link.active:focus,
+      .nav-link.active:hover {
+        background-color: transparent;
+
+        @include themify($themes) {
+          border-color: $color-dusty-white;
+          border-bottom-color: themed('colorBackground');
+          color: themed('colorText');
+        }
+      }
+
+      &.disabled .nav-link {
+        color: $color-additional;
+      }
+    }
+  }
+
+  .tab-pane {
+    padding-top: 20px;
+  }
+
+  &.tabs--bordered-top {
+
+    .nav-tabs {
+      li .nav-link {
+        border-top: 2px solid transparent;
+        border-radius: 0;
+      }
+
+      li .nav-link.active {
+
+        &, &:focus, &:hover {
+          border-top: 3px solid $color-accent;
+        }
+      }
+    }
+  }
+
+  &.tabs--bordered-bottom {
+
+    .nav-tabs {
+
+      li .nav-link {
+        border-color: transparent;
+        border-bottom: 1px solid transparent;
+        padding-bottom: 11px;
+      }
+
+      li .nav-link.active {
+
+        &, &:focus, &:hover {
+          border-radius: 0;
+          border-color: transparent;
+          border-bottom: 2px solid $color-accent;
+          padding-bottom: 10px;
+        }
+      }
+    }
+  }
+
+  &.tabs--justify {
+
+    .nav-tabs {
+      display: flex;
+      flex-wrap: nowrap;
+
+      li {
+        width: 100%;
+
+        a {
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  &.tabs--vertical {
+    overflow-y: auto;
+
+    .tabs__wrap {
+      display: flex;
+    }
+
+    .nav-tabs {
+      border-bottom: none;
+      width: 90px;
+      height: 100%;
+      flex-wrap: wrap;
+
+      .nav-item {
+        margin-bottom: 0;
+      }
+
+      li {
+        margin-top: 0;
+        width: 100%;
+
+        .nav-link {
+          @include directify($directions) {
+            #{directed('padding-right')}: 10px;
+            #{directed('padding-left')}: 0px;
+            #{directed('margin-right')}: 0px;
+            #{directed('border-right')}: 2px solid #dddddd;
+          }
+          padding-top: 10px;
+          padding-bottom: 10px;
+          transition: background-color 0.3s;
+          border-radius: 0;
+          border: none;
+
+          @include themify($themes) {
+            color: themed('colorText');
+          }
+
+          &:hover, &:focus, &:active {
+            outline: none;
+
+            @include themify($themes) {
+              background-color: themed('colorHover');
+            }
+          }
+        }
+
+        .nav-link.active, .nav-link.active:focus,
+        .nav-link.active:hover {
+          background-color: transparent;
+
+          @include directify($directions) {
+              #{directed('border-right-color')}: $color-accent;
+          }
+        }
+
+        &.disabled .nav-link {
+          color: $color-additional;
+        }
+      }
+    }
+
+    .tab-pane {
+      padding-top: 0;
+      @include directify($directions) {
+        #{directed('padding-left')}: 20px;
+      }
+    }
+
+    &.tabs--vertical-colored {
+
+      .nav-tabs {
+        li {
+
+          .nav-link {
+            @include directify($directions) {
+                #{directed('border-right-color')}: #eeeeee;
+            }
+            @include directify($directions) {
+              #{directed('padding-left')}: 10px;
+            }
+            text-align: center;
+          }
+
+          .nav-link.active, .nav-link.active:focus,
+          .nav-link.active:hover {
+            background-color: #eeeeee;
+            @include directify($directions) {
+                #{directed('border-right-color')}: #eeeeee;
+            }
+            color: $color-text;
+          }
+        }
+      }
+    }
+  }
+}
+option{
+  font-size: 13px;
+}
+.skuButton{
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+}
+.ant-select-selector{
+  width: 100%;
+  height: 38px;
+  padding: 4px 11px;
+}
+
+// .ant-table-thead .ant-table-cell{
+//   background-color: #172b4c;
+//   color: white;
+// }
+// .ant-table-thead .ant-table-cell:hover{
+//   background-color: #172b4c;
+//   color: white;
+// }
+// .ant-table-thead .ant-table-cell:hover {
+//   border-top: 3px solid #172b4c;
+//   color: white;
+// }
+.table__header{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.search__option{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 25%;
+}
+.ant-table-tbody:hover > td {
+  background: unset;
+}
+.ant-table-cell ant-table-column-has-sorters:hover{
+  background-color: #172b4c;
+}
+.tab_component{
+  background-color: #eeeeee;
+}
+.theme-light .tabs .nav-tabs .tab_component .nav-link:hover{
+  background-color: #eeeeee;
+  cursor: no-drop;
+}
+.ant-table-cell ant-table-cell-ellipsis ant-table-column-has-sorters:hover{
+  background-color: #172b4c;
+}
+.kit_component_card{
+  min-height: 300px;
+  box-shadow:0px 0px 4px grey;;
+}
+.ant-btn-dangerous.ant-btn-primary:hover{
+  color: #fff;
+    border-color: #f9110c;
+    background: #ff110c;
+}
+.kitComponent_header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.kit_heading{
+  color: #5b73e8;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.ant-btn ant-btn-round ant-btn-primary ant-btn-lg:hover{
+  box-shadow: 0px 0px 10px green;
+}
+.tabs.tabs--vertical.tabs--vertical-colored .nav-tabs li .nav-link.active {
+  background-color: #242058;
+  color: white;
+}
+.tabs.tabs--vertical.tabs--vertical-colored .nav-tabs li .nav-link.active:hover{
+  background-color: #242058;
+  color: white;
+}
+.tabs.tabs--vertical .nav-tabs{
+  width:160px;
+}
