@@ -341,21 +341,6 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
           onSelect={(e) => {
             console.log(e);
             myInputNumber.current = e;
-            // setSelectedKeys(
-            //   e === "LessThan"
-            //     ? tableSkuData.filter(
-            //         (field) => field?.weight <= numericalComparing?.current
-            //       )
-            //     : e === "GreaterThan"
-            //     ? tableSkuData.filter(
-            //         (field) => field?.weight >= numericalComparing?.current
-            //       )
-            //     : e === "EqualTo"
-            //     ? tableSkuData.filter(
-            //         (field) => field?.weight === numericalComparing?.current
-            //       )
-            //     : null
-            // );
           }}
           onChange={(e) => {
             console.log(`changeSelect ${e}`);
@@ -372,12 +357,10 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
           <div
             style={{
               padding: 8,
-              // display:'flex'
             }}
           >
             <Space direction="vertical">
               <InputNumber
-                // value={numericalComparing}
                 defaultValue={0}
                 ref={numericalComparing}
                 addonAfter={selectAfter}
