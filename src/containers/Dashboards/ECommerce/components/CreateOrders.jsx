@@ -15,6 +15,7 @@ import useGetReq from "../../../../customHooks/useGetReq";
 const { Step } = Steps;
 
 const CreateOrders = () => {
+  // code pushed to ragahva
   const history = useHistory();
   const formatter = "YYYY-MM-DD[T]HH:mm:ss.000";
   const date = new Date();
@@ -257,7 +258,7 @@ const CreateOrders = () => {
 
   useEffect(() => {
     getData(`${baseUrl}/api/State`, setCountries);
-    
+
     return cancelRequests;
   }, []);
 
