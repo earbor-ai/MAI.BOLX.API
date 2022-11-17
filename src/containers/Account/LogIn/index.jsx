@@ -9,10 +9,10 @@ import showResults from "../../../utils/showResults";
 // const auth0Icon = `${process.env.PUBLIC_URL}/img/auth0.svg`;
 
 const LogIn = ({ changeIsOpenModalFireBase }) => {
-  const cookies = new Cookies();
+  // const cookies = new Cookies();
   const [data, setData] = useState({
-    username: "ram",
-    password: "test5",
+    username: "manoj",
+    password: "test1",
   });
   const [loading, setLoading] = useState(false);
   const history = useHistory();
@@ -27,8 +27,8 @@ const LogIn = ({ changeIsOpenModalFireBase }) => {
       },
     })
       .then((response) => {
-        cookies.set("myToken", response.data.token, { path: "/" });
-        cookies.set("refreshTok", response.data.refreshToken, { path: "/" });
+        localStorage.setItem("myToken", response.data.token);
+        localStorage.setItem("refreshTok", response.data.refreshToken);
         console.log(response.data.token);
         setLoading(false);
         if (response.data.token) {

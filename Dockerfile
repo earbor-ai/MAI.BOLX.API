@@ -1,6 +1,7 @@
-FROM node:12
+FROM node
 WORKDIR /easydev
-COPY /template .
-RUN yarn cache clean
-RUN yarn install
+COPY package.json .
+RUN npm install
+COPY . .
 EXPOSE 3000
+CMD ["npm", "start"]

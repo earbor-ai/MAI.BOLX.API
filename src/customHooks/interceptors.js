@@ -1,9 +1,9 @@
 import axios from "axios";
-import Cookies from "universal-cookie";
+// import Cookies from "universal-cookie";
 
 axios.defaults.baseURL = "http://216.230.74.17:8013/api";
 
-const cookies = new Cookies();
+// const cookies = new Cookies();
 function createAxiosResponseInterceptor() {
   const interceptor = axios.interceptors.response.use(
     (response) => response,
@@ -15,12 +15,12 @@ function createAxiosResponseInterceptor() {
 
       return axios
         .post("/Auth/refresh-token", {
-          accessToken: cookies.get("myToken"),
-          refreshToken: cookies.get("refreshTok"),
+          accessToken: localStorage.getItem("myToken"),
+          refreshToken: localStorage.getItem("refreshTok"),
         })
         .then((response) => {
-          cookies.set("myToken", response.data.accessToken, { path: "/" });
-          cookies.set("refreshTok", response.data.refreshToken, { path: "/" });
+          localStorage.setItem("myToken", response.data.accessToken);
+          localStorage.setItem("refreshTok", response.data.refreshToken);
           error.response.config.headers[
             "Authorization"
           ] = `Bearer ${response.data.accessToken}`;
@@ -29,8 +29,8 @@ function createAxiosResponseInterceptor() {
         .catch((error2) => {
           console.log(error2);
           return (
-            cookies.remove("myToken", { path: "/" }),
-            cookies.remove("refreshTok", { path: "/" }),
+            localStorage.remove("myToken"),
+            localStorage.remove("refreshTok"),
             this.router.push("/"),
             Promise.reject(error2)
           );

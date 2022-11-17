@@ -48,7 +48,7 @@ const FinanceDashboard = ({ dispatch, cryptoTable, rtl, theme }) => {
 
   useEffect(() => {
     axios
-      .get("http://216.230.74.17:8013/api/Client", {
+      .get("http://216.230.74.17:8013/api/Order?clientId=1029", {
         headers: { Authorization: `Bearer ${token}` },
         Accept: "*/*",
       })

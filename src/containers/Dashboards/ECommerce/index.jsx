@@ -60,6 +60,8 @@ const ECommerceDashboard = () => {
   const searchInput = useRef(null);
   const [searchedColumn, setSearchedColumn] = useState("");
   const [searchText, setSearchText] = useState("");
+  const [startDate, setStartDate] = useState();
+  const [endDate, setEndDate] = useState();
 
   useEffect(() => {
     getData(
@@ -487,6 +489,19 @@ const ECommerceDashboard = () => {
   // }, [items, filterColumns]);
   // console.log(items);
 
+  const getDateRange = (date, dateString) => {
+    console.log(date, dateString);
+    date.map((sd) => setStartDate(sd?._d));
+    dateString.map((sd) => setEndDate(sd?._d));
+    console.log(startDate, endDate);
+
+    const resultProductData = orderDataSource.filter((d) => {
+      const time = new Date(d.orderDate).getTime();
+      return startDate < time && time < endDate;
+    });
+    console.log(resultProductData);
+  };
+
   const handleClick = () => {
     const workSheet = XLSX.utils.json_to_sheet(items);
     const workBook = { Sheets: { data: workSheet }, SheetNames: ["data"] };
@@ -579,7 +594,10 @@ const ECommerceDashboard = () => {
                     </div>
                     <div className="search__input">
                       <div>
-                        <RangePicker style={{ marginRight: "10px" }} />
+                        <RangePicker
+                          style={{ marginRight: "10px" }}
+                          onChange={getDateRange}
+                        />
                         <Dropdown overlay={menu} arrow>
                           <Button>
                             <Space>
