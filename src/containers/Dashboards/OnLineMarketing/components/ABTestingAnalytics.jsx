@@ -1,4 +1,11 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
 import PropTypes, { func } from "prop-types";
 import { connect } from "react-redux";
 import {
@@ -80,7 +87,7 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
-  const numericalComparing = useRef(0);
+  const numericalComparing = useRef(null);
   const [filteredInfo, setFilteredInfo] = useState({});
   // const [numericalComparing, setNumericalComparing] = useState(null);
   const searchInputNumber = useRef(null);
@@ -88,6 +95,7 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
   //   Symbol: "",
   // });
   const myInputNumber = useRef("");
+  const [getTheValue, setGetTheValue] = useState(null);
   const [skuData, setSkuData] = useState({
     alternateitemcode: null,
     alternateitemdescription: null,
@@ -176,6 +184,8 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
   ]);
   const token =
     "eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidGVzdCIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSIsImV4cCI6IjE2NTc2OTY1NDIiLCJuYmYiOiIxNjU3NjEwMTQyIn0";
+
+    // const tok=document.cookie('')
   const handleSku = (e) => {
     const { name, value } = e.target;
     setSkuData((state) => ({
@@ -315,7 +325,7 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
   });
   const handleResetting = (clearFilters) => {
     clearFilters();
-    // numericalComparing.current.value = 0;
+    numericalComparing.current.value = 0;
   };
   const handleSearchNumber = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -338,12 +348,37 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
             width: 78,
           }}
           defaultValue=""
+          // ref={myInputNumber}
           onSelect={(e) => {
-            console.log(e);
+            console.log(`selected values is ${e}`);
             myInputNumber.current = e;
+            console.log(numericalComparing?.current.value);
+            setSelectedKeys(
+              myInputNumber?.current === "LessThan" &&
+                numericalComparing.current.value !== null
+                ? tableSkuData.filter(
+                    (field) =>
+                      field?.weight <= numericalComparing?.current.value
+                  )
+                : myInputNumber?.current === "GreaterThan" &&
+                  numericalComparing.current.value !== null
+                ? tableSkuData.filter(
+                    (field) =>
+                      field?.weight >= numericalComparing?.current.value
+                  )
+                : myInputNumber?.current === "EqualTo" &&
+                  numericalComparing.current.value !== null
+                ? tableSkuData.filter(
+                    (field) =>
+                      field?.weight == numericalComparing?.current.value
+                  )
+                : null
+            );
           }}
           onChange={(e) => {
             console.log(`changeSelect ${e}`);
+            // myInputNumber.current = e;
+            console.log(selectedKeys);
           }}
         >
           <Option value="">select</Option>
@@ -357,12 +392,15 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
           <div
             style={{
               padding: 8,
+              // display:'flex'
             }}
           >
             <Space direction="vertical">
               <InputNumber
-                defaultValue={0}
+                // value={numericalComparing}
+                defaultValue={null}
                 ref={numericalComparing}
+                value={numericalComparing?.current}
                 addonAfter={selectAfter}
                 onPressEnter={() =>
                   handleSearchNumber(selectedKeys, confirm, dataIndex)
@@ -388,37 +426,15 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
                         )
                       : null
                   );
+                  // console.log(selectedKeys);
                 }}
               />
               <Space>
                 <Button
                   type="link"
                   size="small"
-                  // ref={myInputNumber}
                   onClick={(e) => {
-                    console.log(e);
                     handleSearchNumber(selectedKeys, confirm, dataIndex);
-                    console.log(myInputNumber);
-                    console.log(numericalComparing);
-                    setSelectedKeys(
-                      myInputNumber?.current === "LessThan"
-                        ? tableSkuData.filter(
-                            (field) =>
-                              field?.weight <= numericalComparing?.current
-                          )
-                        : myInputNumber?.current === "GreaterThan"
-                        ? tableSkuData.filter(
-                            (field) =>
-                              field?.weight >= numericalComparing.current
-                          )
-                        : myInputNumber?.current === "EqualTo"
-                        ? tableSkuData.filter(
-                            (field) =>
-                              field?.weight === numericalComparing?.current
-                          )
-                        : null
-                    );
-                    console.log(selectedKeys);
                   }}
                 >
                   Filter
@@ -465,10 +481,7 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
     onFilterDropdownVisibleChange: (visible) => {
       console.log(visible);
       if (visible) {
-        setTimeout(
-          () => myInputNumber && numericalComparing.current?.select(),
-          100
-        );
+        setTimeout(() => numericalComparing.current?.select(), 100);
       }
     },
   });
@@ -670,6 +683,7 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
     axios({
       method: "POST",
       url: "https://localhost:7039/api/Sku",
+      // url: "http://216.230.74.17:8013/api/Sku",
       data: d,
       headers: {
         Authorization: `Bearer ${authToken}`,
