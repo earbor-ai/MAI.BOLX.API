@@ -1,54 +1,71 @@
 import React from "react";
 import { Field, Form } from "react-final-form";
 import { connect } from "react-redux";
+// import { Input } from "antd";
 import AccountOutlineIcon from "mdi-react/AccountOutlineIcon";
 import { NavLink } from "react-router-dom";
 import PropTypes from "prop-types";
+import {
+  EyeInvisibleOutlined,
+  EyeTwoTone,
+  KeyOutlined,
+  LockOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import { Input, Space } from "antd";
 import { Alert, Button } from "reactstrap";
 import PasswordField from "../form/Password";
 import renderCheckBoxField from "../form/CheckBox";
 
 const LogInForm = ({
   onSubmit,
-  errorMessage,
   errorMsg,
+  errorMessage,
   loading,
   fieldUser,
   typeFieldUser,
   form,
+  setUserName,
+  setPassword,
 }) => {
+  const [passwordVisible, setPasswordVisible] = React.useState(false);
   return (
     <Form onSubmit={onSubmit}>
       {({ handleSubmit }) => (
         <form className="form login-form" onSubmit={handleSubmit}>
-          <Alert color="danger" isOpen={!!errorMessage || !!errorMsg}>
-            {errorMessage}
-            {errorMsg}
-          </Alert>
+            {errorMessage ? <p style={{ color: 'red', backgroundColor: '#ffffdc', padding: '5px 20px 5px 20px' }}>{errorMessage}</p> : null}
           <div className="form__form-group">
             <span className="form__form-group-label">{fieldUser}</span>
-            <div className="form__form-group-field">
-              <div className="form__form-group-icon">
-                <AccountOutlineIcon />
-              </div>
-              <Field
-                name="username"
-                component="input"
-                type={typeFieldUser}
-                placeholder={fieldUser}
-                className="input-without-border-radius"
-              />
-            </div>
+            <Input
+              size="small"
+              placeholder="enter username"
+              onChange={(e) => setUserName(e.target.value)}
+              prefix={<UserOutlined />}
+              rules={[
+                {
+                  required: true,
+                  message: 'Please enter your usename!',
+                },
+              ]}
+            />
           </div>
           <div className="form__form-group">
             <span className="form__form-group-label">Password</span>
             <div className="form__form-group-field">
-              <Field
-                name="password"
-                component={PasswordField}
-                placeholder="Password"
-                className="input-without-border-radius"
-                keyIcon
+              <Input.Password
+                placeholder="enter password"
+                size="small"
+                prefix={<LockOutlined />}
+                onChange={(e) => setPassword(e.target.value)}
+                iconRender={(visible) =>
+                  visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+                }
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please enter your password!',
+                  },
+                ]}
               />
               <div className="account__forgot-password">
                 <NavLink to="/reset_password">Forgot a password?</NavLink>
@@ -65,19 +82,22 @@ const LogInForm = ({
               />
             </div>
           </div>
+
+        
           <div className="account__btns">
-            {
-            loading
-            ? 
-            <Button className="account__btn" disabled type="button" color="primary">
-              Signing in ....
-            </Button>
-             : (
-                <Button className="account__btn" type="submit" color="primary">
-                  Sign In
-                </Button>
-              )
-          }
+            {loading ? (
+              <Button
+                className="account__btn"
+                type="button"
+                color="primary"
+              >
+                Signing in ....
+              </Button>
+            ) : (
+              <Button className="account__btn" type="submit" color="primary">
+                Sign In
+              </Button>
+            )}
             <NavLink
               className="btn btn-outline-primary account__btn"
               to="/register"

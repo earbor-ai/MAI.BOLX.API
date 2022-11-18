@@ -9,33 +9,43 @@ import showResults from "../../../utils/showResults";
 // const auth0Icon = `${process.env.PUBLIC_URL}/img/auth0.svg`;
 
 const LogIn = ({ changeIsOpenModalFireBase }) => {
-  // const cookies = new Cookies();
-  const [data, setData] = useState({
-    username: "manoj",
-    password: "test1",
-  });
+  const [userName, setUserName] = useState();
+  const [password, setPassword] = useState();
+  const [errorMessage, setErrorMessage] = useState();
+  console.log(userName, password);
   const [loading, setLoading] = useState(false);
   const history = useHistory();
   const login = () => {
-    setLoading(true);
-    axios({
-      method: "POST",
-      url: "http://216.230.74.17:8013/api/Auth/login",
-      data: data,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-      },
-    })
-      .then((response) => {
-        localStorage.setItem("myToken", response.data.token);
-        localStorage.setItem("refreshTok", response.data.refreshToken);
-        console.log(response.data.token);
-        setLoading(false);
-        if (response.data.token) {
-          history.push("/finance_dashboard");
-        }
+    if (!userName || !password) {
+      setErrorMessage("Please enter username and password");
+    } else {
+      setErrorMessage(null);
+      setLoading(true);
+      axios({
+        method: "POST",
+        url: "http://216.230.74.17:8013/api/Auth/login",
+        data: {
+          username: userName,
+          password: password,
+        },
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
       })
-      .catch((error) => console.log(error));
+        .then((response) => {
+          localStorage.setItem("myToken", response.data.token);
+          localStorage.setItem("refreshTok", response.data.refreshToken);
+          console.log(response.data.token);
+          setLoading(false);
+          if (response.data.token) {
+            history.push("/finance_dashboard");
+          }
+          if (response.data.status === 400) {
+            setErrorMessage("Invalid credentials please check");
+          }
+        })
+        .catch((error) => console.log(error));
+    }
   };
   return (
     <div className="account account--not-photo">
@@ -54,7 +64,14 @@ const LogIn = ({ changeIsOpenModalFireBase }) => {
               Start your business easily
             </h4>
           </div>
-          <LogInForm onSubmit={login} form="log_in_form" loading={loading} />
+          <LogInForm
+            onSubmit={login}
+            setUserName={setUserName}
+            setPassword={setPassword}
+            form="log_in_form"
+            loading={loading}
+            errorMessage={errorMessage}
+          />
         </div>
       </div>
     </div>

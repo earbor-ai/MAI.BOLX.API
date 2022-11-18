@@ -2,11 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router";
 import axios from "axios";
 import { Col, Card, CardBody } from "reactstrap";
+import { Steps } from "antd";
 import SweetAlert from "react-bootstrap-sweetalert";
 import EditOrderItems from "./EditOrderItems";
 import EditShipments from "./EditShipments";
 import BASE_URL from "../../../../utils/api/baseUrl";
 import EditOverview from "./EditOverview";
+
+const { Step } = Steps;
 
 const EditOrders = () => {
   const { orderID } = useParams();
@@ -24,6 +27,7 @@ const EditOrders = () => {
   const [countries, setCountries] = useState();
   const [spin, setSpin] = useState();
   const [isSucess, setIsSucess] = useState(false);
+  const [current, setCurrent] = useState(0);
   const [selectedState, setSelectedpState] = useState({
     shipCountry: "USA",
     billCountry: "CANADA",
@@ -33,11 +37,13 @@ const EditOrders = () => {
 
   const nextPage = () => {
     setPage(page + 1);
+    setCurrent(current + 1);
     Object.assign(resData?.orderItems, orderItemsData);
   };
 
   const previousPage = () => {
     setPage(page - 1);
+    setCurrent(current - 1);
   };
 
   const handleUpdate = (e) => {
@@ -145,6 +151,54 @@ const EditOrders = () => {
     setSelected(value);
   };
 
+  const steps = [
+    {
+      title: "Order Items",
+      content: (
+        <EditOrderItems
+          onSubmit={nextPage}
+          resData={resData}
+          orderItemsData={orderItemsData}
+          orderItems={orderItems}
+          setOrderItemsData={setOrderItemsData}
+          onClientChange={onClientChange}
+          selected={selected}
+          setSelected={setSelected}
+          loading={loading}
+          options={options}
+          spin={spin}
+        />
+      ),
+    },
+    {
+      title: "Shipping/Billing Details",
+      content: (
+        <EditShipments
+          onSubmit={nextPage}
+          resData={resData}
+          previousPage={previousPage}
+          shippingData={shippingData}
+          data={data}
+          update={handleUpdate}
+          submitData={submitUpdatedData}
+          countries={countries}
+        />
+      ),
+    },
+    {
+      title: "Overview",
+      content: (
+        <EditOverview
+          dataSource={orderItemsData}
+          details={data}
+          onSubmit={submitUpdatedData}
+          previousPage={previousPage}
+          isButtonLoading={isButtonLoading}
+        />
+      ),
+    },
+  ];
+
   return (
     <Col md={12} lg={12}>
       {isSucess ? (
@@ -162,30 +216,13 @@ const EditOrders = () => {
       ) : null}
       <Card className="wizard__Card">
         <CardBody className="wizard">
-          <div className="wizard__steps">
-            <div
-              className={`wizard__step${
-                page === 1 ? " wizard__step--active" : ""
-              }`}
-            >
-              <p>Order Items</p>
-            </div>
-            <div
-              className={`wizard__step${
-                page === 2 ? " wizard__step--active" : ""
-              }`}
-            >
-              <p>Shipping/Billing Details</p>
-            </div>
-            <div
-              className={`wizard__step${
-                page === 3 ? " wizard__step--active" : ""
-              }`}
-            >
-              <p>OverView</p>
-            </div>
-          </div>
-          <div>
+        <Steps current={current}>
+            <Step title="Order Items" labelPlacement="vertical" />
+            <Step title="Shipping/Billing Details" labelPlacement="vertical" />
+            <Step title="Overview" labelPlacement="vertical" />
+          </Steps>
+          <div className="steps-content">{steps[current].content}</div>
+          {/* <div>
             {page === 1 && (
               <EditOrderItems
                 onSubmit={nextPage}
@@ -222,7 +259,7 @@ const EditOrders = () => {
                 isButtonLoading={isButtonLoading}
               />
             )}
-          </div>
+          </div> */}
         </CardBody>
       </Card>
     </Col>

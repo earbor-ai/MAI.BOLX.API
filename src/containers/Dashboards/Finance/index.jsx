@@ -44,11 +44,23 @@ const FinanceDashboard = ({ dispatch, cryptoTable, rtl, theme }) => {
   const [getData, cancelRequests] = useGetReq();
 
   const cookies = new Cookies();
-  const token = cookies.get("myToken");
+  const token = localStorage.getItem("myToken");
+  console.log(token);
 
   useEffect(() => {
     axios
-      .get("http://216.230.74.17:8013/api/Order?clientId=1029", {
+      .get(`http://216.230.74.17:8013/api/Sku?clientId=1029`, {
+        headers: { Authorization: `Bearer ${token}` },
+        Accept: "*/*",
+      })
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((error) => error.message);
+  }, [token]);
+  useEffect(() => {
+    axios
+      .get(`http://216.230.74.17:8013/api/SkuKitMapping?clientId=1029`, {
         headers: { Authorization: `Bearer ${token}` },
         Accept: "*/*",
       })
