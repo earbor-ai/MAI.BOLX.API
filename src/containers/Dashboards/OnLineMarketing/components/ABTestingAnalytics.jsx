@@ -86,20 +86,14 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
   const [filterColumns, setFilteredColumns] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
+  const [filteredInfo, setFilteredInfo] = useState({});
   const searchInput = useRef(null);
   const numericalComparing = useRef(null);
-  const [filteredInfo, setFilteredInfo] = useState({});
-  // const [numericalComparing, setNumericalComparing] = useState(null);
-  const searchInputNumber = useRef(null);
-  // const [myInputNumber, setMyInputNumber] = useState({
-  //   Symbol: "",
-  // });
   const myInputNumber = useRef("");
-  const [getTheValue, setGetTheValue] = useState(null);
   const [skuData, setSkuData] = useState({
     alternateitemcode: null,
     alternateitemdescription: null,
-    clientId: "",
+    clientid: "",
     cyclemonths: null,
     description: "",
     entryDate: "2022-07-07T12:53:41.46",
@@ -117,7 +111,7 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
     iskititem: false,
     islotCode: false,
     isoversize: false,
-    itemType: "",
+    itemtype: "",
     itemcategory: null,
     manufacturervendor: null,
     maxorderQty: null,
@@ -158,8 +152,8 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
     isoversize: false,
     itemcategory: null,
     manufacturervendor: null,
-    maxorderQty: null,
-    minorderQty: null,
+    maxorderqty: null,
+    minorderqty: null,
     modifiedDate: "2022-07-07T12:53:41.46",
     modifiedUserId: 1002,
     mpnCode: null,
@@ -169,7 +163,7 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
     sellcost: null,
     storagetype: null,
     subitemcategory: null,
-    clientId: `${1029}`,
+    clientid: `${1029}`,
   });
   const [defaultValue, setDefaultValues] = useState([
     "1",
@@ -182,32 +176,37 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
     // "8",
     // "9",
   ]);
-  const token =
-    "eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidGVzdCIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSIsImV4cCI6IjE2NTc2OTY1NDIiLCJuYmYiOiIxNjU3NjEwMTQyIn0";
-
-    // const tok=document.cookie('')
+  // const token =
+  //   "eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidGVzdCIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSIsImV4cCI6IjE2NTc2OTY1NDIiLCJuYmYiOiIxNjU3NjEwMTQyIn0";
+  const cookies = new Cookies();
+  const token = cookies.get("myToken");
+  console.log(token);
+  const refreshOne = cookies.get("refreshTok");
+  console.log(refreshOne);
   const handleSku = (e) => {
     const { name, value } = e.target;
     setSkuData((state) => ({
       ...state,
       [name]: value,
-      clientId: clientValue,
+      clientid: clientValue,
     }));
   };
   // to get dataSource
   useEffect(() => {
-    setShowTable(true);
+    // setShowTable(true);
     const accessToken = token;
-    // const api = `http://216.230.74.17:7039/api/Sku?clientId=${value}`;
-    const api = `https://localhost:7039/api/Sku?clientId=${1029}`;
+    const api = `http://216.230.74.17:8013/api/Sku?clientId=1029`;
+    // const api = `https://localhost:7039/api/Sku?clientId=${1029}`;
     setMyLoading(true);
     setSelectLoading(true);
+    console.log(accessToken);
     axios
       .get(api, {
         headers: { Authorization: `Bearer ${accessToken}` },
         Accept: "*/*",
       })
       .then((res) => {
+        console.log(res?.data);
         setSkeletonLoading(false);
         setAllSkuData(res?.data);
         setTableSkuData(res?.data);
@@ -216,6 +215,7 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
       })
       .catch((error) => error.message);
   }, [added]);
+  // }, []);
 
   const onSelect = (value) => {
     setClientValue(value);
@@ -325,15 +325,16 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
   });
   const handleResetting = (clearFilters) => {
     clearFilters();
-    numericalComparing.current.value = 0;
   };
   const handleSearchNumber = (selectedKeys, confirm, dataIndex) => {
     confirm();
-    // numericalComparing.current.value = 0;
   };
-
   console.log(numericalComparing);
   console.log(myInputNumber);
+  const myClearEvent = (e) => {
+    alert("main");
+    numericalComparing.current.value = "";
+  };
   const getColumnsNumber = (dataIndex) => ({
     filterDropdown: ({
       setSelectedKeys,
@@ -377,7 +378,6 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
           }}
           onChange={(e) => {
             console.log(`changeSelect ${e}`);
-            // myInputNumber.current = e;
             console.log(selectedKeys);
           }}
         >
@@ -392,16 +392,14 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
           <div
             style={{
               padding: 8,
-              // display:'flex'
             }}
           >
             <Space direction="vertical">
               <InputNumber
-                // value={numericalComparing}
                 defaultValue={null}
                 ref={numericalComparing}
-                value={numericalComparing?.current}
                 addonAfter={selectAfter}
+                value={selectedKeys[0]}
                 onPressEnter={() =>
                   handleSearchNumber(selectedKeys, confirm, dataIndex)
                 }
@@ -426,7 +424,7 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
                         )
                       : null
                   );
-                  // console.log(selectedKeys);
+                  console.log(selectedKeys);
                 }}
               />
               <Space>
@@ -440,7 +438,10 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
                   Filter
                 </Button>
                 <Button
-                  onClick={() => clearFilters && handleResetting(clearFilters)}
+                  onClick={() => {
+                    clearFilters && handleResetting(clearFilters);
+                    myClearEvent();
+                  }}
                   size="small"
                   style={{
                     width: 90,
@@ -573,12 +574,12 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
       title: "Item Type",
       responsive: ["xs", "sm", "md", "lg"],
       align: "left",
-      dataKey: "itemType",
-      sorter: (a, b) => a.itemType.length - b.itemType.length,
+      dataKey: "itemtype",
+      sorter: (a, b) => a.itemtype.length - b.itemtype.length,
       render: (_, record) => (
-        <Typography.Text>{record?.itemType}</Typography.Text>
+        <Typography.Text>{record?.itemtype}</Typography.Text>
       ),
-      ...getColumnSearchProps("itemType"),
+      ...getColumnSearchProps("itemtype"),
     },
     {
       key: "5",
@@ -609,18 +610,18 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
       title: "maxorderQty",
       responsive: ["xs", "sm", "md", "lg"],
       align: "left",
-      dataKey: "maxorderQty",
-      sorter: (a, b) => a.maxorderQty - b.maxorderQty,
-      render: (_, record) => record?.maxorderQty,
+      dataKey: "maxorderqty",
+      sorter: (a, b) => a.maxorderqty - b.maxorderqty,
+      render: (_, record) => record?.maxorderqty,
     },
     {
       key: "8",
-      title: "minorderQty",
+      title: "minorderqty",
       responsive: ["xs", "sm", "md", "lg"],
       align: "left",
-      dataKey: "minorderQty",
-      sorter: (a, b) => a.minorderQty - b.minorderQty,
-      render: (_, record) => record?.minorderQty,
+      dataKey: "minorderqty",
+      sorter: (a, b) => a.minorderqty - b.minorderqty,
+      render: (_, record) => record?.minorderqty,
     },
     {
       key: "9",
@@ -639,7 +640,7 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
       dataKey: "iskititem",
       sorter: (a, b) => a.iskititem - b.iskititem,
       render: (_, record) => record?.iskititem,
-      ...getColumnSearchProps("maxorderQty"),
+      ...getColumnSearchProps("iskititem"),
     },
   ].filter((item) => !item.hidden);
   const [activeTab, setActiveTab] = useState("1");
@@ -682,8 +683,8 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
     setMyButton(true);
     axios({
       method: "POST",
-      url: "https://localhost:7039/api/Sku",
-      // url: "http://216.230.74.17:8013/api/Sku",
+      // url: "https://localhost:7039/api/Sku",
+      url: "http://216.230.74.17:8013/api/Sku",
       data: d,
       headers: {
         Authorization: `Bearer ${authToken}`,
@@ -700,7 +701,7 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
         setSkuData({
           alternateitemcode: null,
           alternateitemdescription: null,
-          clientId: "",
+          clientid: "",
           cyclemonths: null,
           description: "",
           entryDate: "2022-07-07T12:53:41.46",
@@ -718,11 +719,11 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
           iskititem: false,
           islotCode: false,
           isoversize: false,
-          itemType: "",
+          itemtype: "",
           itemcategory: null,
           manufacturervendor: null,
-          maxorderQty: null,
-          minorderQty: null,
+          maxorderqty: null,
+          minorderqty: null,
           modifiedDate: "2022-07-07T12:53:41.46",
           modifiedUserId: 1002,
           mpnCode: null,
@@ -1046,14 +1047,14 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
                       </Form.Item>
                       <Form.Item
                         label="Item Type:"
-                        name="itemType"
+                        name="itemtype"
                         rules={[
                           {
                             required: true,
                             message: "Please Select itemType!",
                           },
                         ]}
-                        value={skuData?.itemType}
+                        value={skuData?.itemtype}
                       >
                         <Select
                           placeholder="Select Item/Type"
