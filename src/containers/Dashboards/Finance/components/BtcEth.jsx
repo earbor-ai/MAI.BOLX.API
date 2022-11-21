@@ -413,6 +413,9 @@ const BtcEth = ({ theme, dir, name, data }) => {
         if (e?.id === day.getDay()) {
           weeklyArray[i].orders = e2[1];
           weeklyArray[6].orders = 0;
+          weeklyArray[2].orders = 0;
+          weeklyArray[3].orders = 0;
+          weeklyArray[5].orders = 0;
         }
       })
     );

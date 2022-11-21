@@ -412,9 +412,10 @@ const ShipmentsGraph = ({ theme, dir, name, data }) => {
         const day = new Date(e2[0]?.orderDate?.toString()?.substring(0, 10));
         if (e?.id === day.getDay()) {
           weeklyArray[i].shipments = e2[1];
-          weeklyArray[5].orders = 0;
           weeklyArray[6].orders = 0;
-        //   weeklyArray[3].shipments = 0;
+          weeklyArray[2].orders = 0;
+          weeklyArray[3].orders = 0;
+          weeklyArray[5].orders = 0;
         }
       })
     );
