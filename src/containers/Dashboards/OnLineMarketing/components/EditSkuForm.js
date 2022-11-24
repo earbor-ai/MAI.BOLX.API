@@ -12,14 +12,15 @@ import UpdateIcon from "mdi-react/UpdateIcon";
 
 const EditSkuForm = () => {
   const { SKUId } = useParams();
+  console.log(SKUId);
   const history = useHistory();
   const [data, setData] = useState();
   const [utils, setUtils] = useState({
-    clientId: 0,
-    entryuserId: 0,
-    modifiedUserId: 0,
+    clientid: 0,
+    entryuserid: 0,
+    modifieduserid: 0,
   });
-  const { clientId, modifiedUserId, entryuserId } = utils;
+  const { clientid, modifieduserid, entryuserid } = utils;
   const [updateData, setUpdateData] = useState();
   const [openAlert, setOpenAlert] = useState(false);
   const [skeletonLoading, setSkeletonLoading] = useState(false);
@@ -34,32 +35,39 @@ const EditSkuForm = () => {
     setUpdateData((state) => ({
       ...state,
       [name]: value,
-      clientId: Number(clientId),
-      skuId: Number(SKUId),
-      entryuserId: Number(entryuserId),
-      modifiedUserId: Number(modifiedUserId),
+      clientid: Number(clientid),
+      skuid: Number(SKUId),
+      entryuserid: Number(entryuserid),
+      modifieduserid: Number(modifieduserid),
     }));
   };
 
-  // const cookies = new Cookies();
-  // const SingleClientID = cookies.get("clientId");
+  const cookies = new Cookies();
+  const SingleClientID = cookies.get("clientId");
+  console.log(SingleClientID);
+
+  const token = localStorage.getItem("myToken");
   useEffect(() => {
-    // const api = `http://216.230.74.17:7039/api/Sku?clientId=${SingleClientID}&skuId=${SKUId}`;
-    setFormLoading(true);
+    const accessToken = token;
+    // const api = `http://216.230.74.17:7039/api/Sku?clientId=1029&skuId=${SKUId}`;
     // const api = `https://localhost:7039/api/Sku?clientId=${SingleClientID}&skuId=${SKUId}`;
-    const api = `https://localhost:7039/api/Sku?clientId=${1029}&skuId=${SKUId}`;
+    // const api = `https://localhost:7039/api/Sku?clientId=${1029}&skuId=${SKUId}`;
+    const api = `http://216.230.74.17:8013/api/Sku?clientId=1029&skuId=${SKUId}`;
+    setFormLoading(true);
     axios
       .get(api, {
         Accept: "*/*",
+        headers: { Authorization: `Bearer ${accessToken}` },
       })
       .then((res) => {
         setFormLoading(false);
-        setData(res.data);
+        console.log(res?.data);
+        setData(res?.data);
         res.data?.map((d) =>
           setUtils({
-            clientId: d?.clientId,
-            entryuserId: d?.entryuserId,
-            modifiedUserId: d?.modifiedUserId,
+            clientid: d?.clientid,
+            entryuserid: d?.entryuserid,
+            modifieduserid: d?.modifieduserid,
           })
         );
         res.data?.map((d) => setUpdateData(d));
@@ -68,19 +76,24 @@ const EditSkuForm = () => {
         console.log(error);
       });
   }, []);
+  console.log(data);
 
   const updateSkuData = () => {
+    const accessToken = token;
     setMyButton(true);
     axios({
       method: "PUT",
-      // url: 'http://216.230.74.17:7039/api/Sku',
-      url: "https://localhost:7039/api/Sku",
+      // url: "http://216.230.74.17:7039/api/Sku",
+      url: "http://216.230.74.17:8013/api/Sku",
+      // url: "https://localhost:7039/api/Sku",
       data: updateData,
       headers: {
         Accept: "*/*",
+        headers: { Authorization: `Bearer ${accessToken}` },
       },
     })
       .then((response) => {
+        console.log(response);
         setOpenAlert(true);
         setMyButton(false);
       })
@@ -183,7 +196,7 @@ const EditSkuForm = () => {
                       <div className="mb-3">
                         <AvField
                           type="select"
-                          name="itemType"
+                          name="itemtype"
                           label={
                             <>
                               <b>Item Type:</b>
@@ -193,7 +206,7 @@ const EditSkuForm = () => {
                           className="form-select"
                           style={{ borderColor: "#5b73e8" }}
                           required
-                          value={d?.itemType}
+                          value={d?.itemtype}
                           onChange={handleUpdate}
                           validate={{
                             required: {
@@ -280,7 +293,7 @@ const EditSkuForm = () => {
                     <Col lg="4">
                       <div className="mb-3">
                         <AvField
-                          name="purchaseCost"
+                          name="purchasecost"
                           label={
                             <>
                               <b>Purchase Cost</b>
@@ -341,7 +354,7 @@ const EditSkuForm = () => {
                   </Row>
                 </Col>
                 <Row>
-                  <Col lg={12} offset={8} style={{ padding: '20px' }}>
+                  <Col lg={12} offset={8} style={{ padding: "20px" }}>
                     {myButton ? (
                       <div>
                         <Button

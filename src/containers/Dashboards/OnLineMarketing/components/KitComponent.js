@@ -24,6 +24,7 @@ const { Option } = Select;
 
 const KitComponent = ({ data, list }) => {
   const { SKUId } = useParams();
+  console.log(SKUId);
   const [form] = Form.useForm();
   const [mainForm] = Form.useForm();
   const [selectedValue, setSelectedValue] = useState();
@@ -54,8 +55,11 @@ const KitComponent = ({ data, list }) => {
     modifieduserid: 1002,
     modifieddate: "2022-09-28T06:52:47.730Z",
   });
+  const token = localStorage.getItem("myToken");
+  const accessToken = token;
   const isEditing = (record) => record.uniqueid === editingKey;
-  const FilteredItems = list?.filter((obj) => obj?.itemType === "Item");
+  const FilteredItems = list?.filter((obj) => obj?.itemtype === "ITEM");
+  // console.log(FilteredItems);
   const edit = (record) => {
     mainForm.setFieldsValue({
       componentskuid: "",
@@ -68,9 +72,11 @@ const KitComponent = ({ data, list }) => {
     axios({
       method: "DELETE",
       // url: `http://216.230.74.17:7039/api/SkuKitMapping?skuKitMappingId=${record}`,
-      url: `https://localhost:7039/api/SkuKitMapping?skuKitMappingId=${record}`,
+      // url: `https://localhost:7039/api/SkuKitMapping?skuKitMappingId=${record}`,
+      url: `http://216.230.74.17:8013/api/SkuKitMapping?skuKitMappingId=${record}`,
       headers: {
         Accept: "*/*",
+        Authorization: `Bearer ${accessToken}`,
       },
     })
       .then((response) => {
@@ -98,7 +104,8 @@ const KitComponent = ({ data, list }) => {
         axios({
           method: "PUT",
           // url: "http://216.230.74.17:7039/api/SkuKitMapping",
-          url: "https://localhost:7039/api/SkuKitMapping",
+          // url: "https://localhost:7039/api/SkuKitMapping",
+          url: "http://216.230.74.17:8013/api/SkuKitMapping",
           data: {
             uniqueid: `${editingKey}`,
             kitskuid: `${SKUId}`,
@@ -112,6 +119,7 @@ const KitComponent = ({ data, list }) => {
           },
           headers: {
             Accept: "*/*",
+            Authorization: `Bearer ${accessToken}`,
           },
         })
           .then((response) => {
@@ -224,14 +232,15 @@ const KitComponent = ({ data, list }) => {
   // const cookies = new Cookies();
   // const SingleClientID = cookies.get("clientId");
   // console.log(SingleClientID);
-  const token =
-    "eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidGVzdCIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSIsImV4cCI6IjE2NTc2OTY1NDIiLCJuYmYiOiIxNjU3NjEwMTQyIn0";
+  // const token =
+  //   "eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidGVzdCIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSIsImV4cCI6IjE2NTc2OTY1NDIiLCJuYmYiOiIxNjU3NjEwMTQyIn0";
+
   useEffect(() => {
     const accessToken = token;
     // const api = `http://216.230.74.17:7039/api/SkuKitMapping?clientId=${SingleClientID}`;
     // const api = `https://localhost:7039/api/SkuKitMapping?clientId=${SingleClientID}`;
-    const api = `https://localhost:7039/api/SkuKitMapping?clientId=${1029}`;
-
+    // const api = `https://localhost:7039/api/SkuKitMapping?clientId=${1029}`;
+    const api = `http://216.230.74.17:8013/api/SkuKitMapping?clientId=1029`;
     axios
       .get(api, {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -267,14 +276,16 @@ const KitComponent = ({ data, list }) => {
   };
   const onFinish = (values) => {
     setConcValues(values);
+    // const accessToken = token;
     Object.assign(expectedData, values);
     setMyButton(true);
     axios({
       method: "POST",
-      // url: "http://216.230.74.17:7039/api/SkuKitMapping",
-      url: "https://localhost:7039/api/SkuKitMapping",
+      url: "http://216.230.74.17:8013/api/SkuKitMapping",
+      // url: "https://localhost:7039/api/SkuKitMapping",
       data: expectedData,
       headers: {
+        Authorization: `Bearer ${accessToken}`,
         Accept: "*/*",
       },
     })
@@ -481,7 +492,7 @@ const KitComponent = ({ data, list }) => {
                           >
                             {FilteredItems?.map((opt) => (
                               <>
-                                <Option value={opt?.skuId}>
+                                <Option value={opt?.skuid}>
                                   {opt?.sku1}-{opt?.description}
                                 </Option>
                               </>

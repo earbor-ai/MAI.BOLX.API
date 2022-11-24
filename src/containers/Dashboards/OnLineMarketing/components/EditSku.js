@@ -24,6 +24,7 @@ import EditSkuForm from "./EditSkuForm";
 
 const EditSku = () => {
   const { SKUId } = useParams();
+  console.log(SKUId)
   const history = useHistory();
   const [list, setList] = useState();
   const [data, setData] = useState();
@@ -35,20 +36,28 @@ const EditSku = () => {
     if (activeTab !== tab) setActiveTab(tab);
   };
   console.log(list);
-  const token =
-    "eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidGVzdCIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSIsImV4cCI6IjE2NTc2OTY1NDIiLCJuYmYiOiIxNjU3NjEwMTQyIn0";
+  //const token =
+  //"eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidGVzdCIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSIsImV4cCI6IjE2NTc2OTY1NDIiLCJuYmYiOiIxNjU3NjEwMTQyIn0";
   const cookies = new Cookies();
+  const token = localStorage.getItem("myToken");
+  console.log(token)
   useEffect(() => {
+    const accessToken =token;
     const abortController = new AbortController();
-    const SingleClientID = cookies.get("clientId");
-    // const api = `http://216.230.74.17:7039/api/Sku?clientId=${SingleClientID}&skuId=${SKUId}`;
+    // const SingleClientID = cookies.get("clientId");
+    // const api = `http://216.230.74.17:7039/api/Sku?clientId=${1029}&skuId=${SKUId}`;
+    console.log(SKUId);
+    const api = `http://216.230.74.17:8013/api/Sku?clientId=1029&skuId=${SKUId}`;
+    // http://216.230.74.17:8013/api/Sku?clientId=1029&skuId=3134
     // const api = `https://localhost:7039/api/Sku?clientId=${SingleClientID}&skuId=${SKUId}`;
-    const api = `https://localhost:7039/api/Sku?clientId=${1029}&skuId=${SKUId}`;
+    // const api = `https://localhost:7039/api/Sku?clientId=${1029}&skuId=${SKUId}`;
     axios
       .get(api, {
         Accept: "*/*",
+        headers: { Authorization: `Bearer ${accessToken}`, "Access-Control-Allow-Origin": "*" },
       })
       .then((res) => {
+        console.log(res?.data)
         setData(res?.data);
       })
       .catch((error) => {
@@ -67,13 +76,15 @@ const EditSku = () => {
     // const getCLient = localStorage.getItem("CLIENTID");
     // const api = `http://216.230.74.17:7039/api/Sku?clientId=${getCLient}`;
     // const api = `https://localhost:7039/api/Sku?clientId=${getCLient}`;
-    const api = `https://localhost:7039/api/Sku?clientId=${1029}`;
+    // const api = `https://localhost:7039/api/Sku?clientId=${1029}`;
+    const api = `http://216.230.74.17:8013/api/Sku?clientId=1029`;
     axios
       .get(api, {
-        headers: { Authorization: `Bearer ${accessToken}` },
         Accept: "*/*",
+        headers: { Authorization: `Bearer ${accessToken}`,"Access-Control-Allow-Origin": "*" }
       })
       .then((res) => {
+        console.log(res?.data)
         setList(res?.data);
         console.log(res?.data);
       })
@@ -87,7 +98,7 @@ const EditSku = () => {
   return (
     <div>
       {data?.map((d) => (
-        <div key={d?.clientId}>
+        <div key={d?.clientid}>
          <Col sm={12} md={12} lg={12} xl={12}>
             {/* <h5>Update SKU</h5> */}
             <Card style={{ minHeight: "500px" }}>
@@ -103,7 +114,7 @@ const EditSku = () => {
                       <b>Item</b>
                     </NavLink>
                   </NavItem>
-                  {d?.itemType === "Prebuild KIT" ? (
+                  {d?.itemtype === "Prebuild KIT" ? (
                     <NavItem>
                       <NavLink
                         className={classnames({ active: activeTab === "2" })}
@@ -112,7 +123,7 @@ const EditSku = () => {
                         <BoxOutlineIcon /> <b> KIT Component</b>
                       </NavLink>
                     </NavItem>
-                  ) : d?.itemType === "Dynamic KIT" ? (
+                  ) : d?.itemtype === "Dynamic KIT" ? (
                     <NavItem>
                       <NavLink
                         className={classnames({ active: activeTab === "2" })}

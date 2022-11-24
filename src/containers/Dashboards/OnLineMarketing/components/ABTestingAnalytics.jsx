@@ -27,6 +27,7 @@ import {
   Checkbox,
   Row,
   Slider,
+  DatePicker,
 } from "antd";
 import SearchIcon from "mdi-react/SearchIcon";
 import AddIcon from "mdi-react/AddIcon";
@@ -50,6 +51,7 @@ import classnames from "classnames";
 import SweetAlert from "react-bootstrap-sweetalert";
 import { AvForm, AvField, AvFeedback } from "availity-reactstrap-validation";
 import { Link, Router } from "react-router-dom";
+import moment from "moment";
 import Cookies from "universal-cookie";
 import "antd/dist/antd.css";
 import { set } from "react-hook-form";
@@ -60,10 +62,12 @@ import {
   SettingOutlined,
   DownOutlined,
   SearchOutlined,
+  CalendarOutlined,
 } from "@ant-design/icons";
 import jsPDF from "jspdf";
 
 const { Option } = Select;
+const { RangePicker } = DatePicker;
 
 const ABTestingAnalytics = ({ dir, themeName }) => {
   const [form] = Form.useForm();
@@ -90,13 +94,30 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
   const searchInput = useRef(null);
   const numericalComparing = useRef(null);
   const myInputNumber = useRef("");
+  const date = new Date();
+  const currentDate =
+    date.getFullYear() +
+    "-" +
+    ("0" + (date.getMonth() + 1)).slice(-2) +
+    "-" +
+    ("0" + date.getDate()).slice(-2) +
+    "T" +
+    ("0" + date.getHours()).slice(-2) +
+    ":" +
+    ("0" + date.getMinutes()).slice(-2) +
+    ":" +
+    ("0" + (date.getSeconds() + 1)).slice(-2) +
+    "." +
+    "000";
+  console.log(currentDate);
   const [skuData, setSkuData] = useState({
     alternateitemcode: null,
     alternateitemdescription: null,
     clientid: "",
     cyclemonths: null,
     description: "",
-    entryDate: "2022-07-07T12:53:41.46",
+    // entryDate: "2022-07-07T12:53:41.46",
+    entryDate: currentDate,
     entryuserId: 1002,
     expDays: 365,
     expyears: null,
@@ -116,7 +137,7 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
     manufacturervendor: null,
     maxorderQty: null,
     minorderQty: null,
-    modifiedDate: "2022-07-07T12:53:41.46",
+    modifiedDate: currentDate,
     modifiedUserId: 1002,
     mpnCode: null,
     originid: null,
@@ -136,7 +157,7 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
     alternateitemcode: null,
     alternateitemdescription: null,
     cyclemonths: null,
-    entryDate: "2022-07-07T12:53:41.46",
+    entryDate: currentDate,
     entryuserId: 1002,
     expDays: 365,
     expyears: null,
@@ -154,7 +175,7 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
     manufacturervendor: null,
     maxorderqty: null,
     minorderqty: null,
-    modifiedDate: "2022-07-07T12:53:41.46",
+    modifiedDate: currentDate,
     modifiedUserId: 1002,
     mpnCode: null,
     originid: null,
@@ -175,14 +196,12 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
     // "7",
     // "8",
     // "9",
+    // "10",
+    "11",
   ]);
+  const [zeroData, setZeroData] = useState(null);
   // const token =
   //   "eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidGVzdCIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSIsImV4cCI6IjE2NTc2OTY1NDIiLCJuYmYiOiIxNjU3NjEwMTQyIn0";
-  const cookies = new Cookies();
-  const token = cookies.get("myToken");
-  console.log(token);
-  const refreshOne = cookies.get("refreshTok");
-  console.log(refreshOne);
   const handleSku = (e) => {
     const { name, value } = e.target;
     setSkuData((state) => ({
@@ -192,9 +211,12 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
     }));
   };
   // to get dataSource
+  const token = localStorage.getItem("myToken");
   useEffect(() => {
     // setShowTable(true);
+    console.log(token);
     const accessToken = token;
+    console.log(accessToken);
     const api = `http://216.230.74.17:8013/api/Sku?clientId=1029`;
     // const api = `https://localhost:7039/api/Sku?clientId=${1029}`;
     setMyLoading(true);
@@ -203,19 +225,19 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
     axios
       .get(api, {
         headers: { Authorization: `Bearer ${accessToken}` },
-        Accept: "*/*",
       })
       .then((res) => {
         console.log(res?.data);
-        setSkeletonLoading(false);
+        // setSkeletonLoading(false);
         setAllSkuData(res?.data);
         setTableSkuData(res?.data);
         setMyLoading(false);
         setSelectLoading(false);
       })
-      .catch((error) => error.message);
+      .catch((error) => {
+        console.log(error);
+      });
   }, [added]);
-  // }, []);
 
   const onSelect = (value) => {
     setClientValue(value);
@@ -325,15 +347,10 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
   });
   const handleResetting = (clearFilters) => {
     clearFilters();
+    numericalComparing.current.value = 0;
   };
   const handleSearchNumber = (selectedKeys, confirm, dataIndex) => {
     confirm();
-  };
-  console.log(numericalComparing);
-  console.log(myInputNumber);
-  const myClearEvent = (e) => {
-    alert("main");
-    numericalComparing.current.value = "";
   };
   const getColumnsNumber = (dataIndex) => ({
     filterDropdown: ({
@@ -396,16 +413,17 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
           >
             <Space direction="vertical">
               <InputNumber
-                defaultValue={null}
+                defaultValue={0}
                 ref={numericalComparing}
                 addonAfter={selectAfter}
-                value={selectedKeys[0]}
+                value={numericalComparing?.current?.value}
                 onPressEnter={() =>
                   handleSearchNumber(selectedKeys, confirm, dataIndex)
                 }
                 onChange={(e) => {
                   numericalComparing.current = e;
                   console.log(numericalComparing);
+                  // setZeroData(0)
                   setSelectedKeys(
                     myInputNumber?.current === "LessThan"
                       ? tableSkuData.filter(
@@ -422,6 +440,8 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
                           (field) =>
                             field?.weight === numericalComparing?.current
                         )
+                      : numericalComparing === null
+                      ? null
                       : null
                   );
                   console.log(selectedKeys);
@@ -440,7 +460,6 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
                 <Button
                   onClick={() => {
                     clearFilters && handleResetting(clearFilters);
-                    myClearEvent();
                   }}
                   size="small"
                   style={{
@@ -487,18 +506,83 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
     },
   });
 
-  useEffect(() => {
-    // const api = 'http://216.230.74.17:7039/api/Client';
-    const api = "https://localhost:7039/api/Client";
-    axios
-      .get(api, {
-        Accept: "*/*",
-      })
-      .then((res) => {
-        setClientList(res?.data);
-      })
-      .catch((error) => {});
-  }, []);
+  const handleDates = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+  };
+  const HandleDateSetting = (clearFilters) => {
+    clearFilters();
+    // setZeroData("");
+  };
+  const getColumnsDate = (dataIndex) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+      close,
+    }) => {
+      const changingDate = (date, dateString) => {
+        setZeroData(dateString)
+        setSelectedKeys(
+          dateString !== ""
+            ? tableSkuData.filter(
+                (field) =>
+                  field?.entrydate.substr(0, 10) >= dateString[0] &&
+                  field?.entrydate.substr(0, 10) <= dateString[1]
+              )
+            : null
+        );
+      };
+      return (
+        <>
+          <div
+            style={{
+              padding: 8,
+            }}
+          >
+            <Space direction="horizontal">
+              <RangePicker onChange={changingDate}/>
+            </Space>
+            <Space>
+              <Button
+                type="link"
+                size="small"
+                onClick={(e) => {
+                  handleDates(selectedKeys, confirm, dataIndex);
+                }}
+              >
+                Filter
+              </Button>
+              {/* <Button
+                onClick={() => {
+                  clearFilters && HandleDateSetting(clearFilters);
+                }}
+                size="small"
+                style={{
+                  width: 90,
+                }}
+              >
+                Reset
+              </Button> */}
+            </Space>
+          </div>
+        </>
+      );
+    },
+    filterIcon: (filtered) => (
+      <CalendarOutlined
+        style={{
+          color: filtered ? "#1890ff" : undefined,
+        }}
+      />
+    ),
+    onFilter: (value, record) => {
+      return record?.entrydate.substr(0, 10) === value?.entrydate.substr(0, 10);
+    },
+    onFilterDropdownVisibleChange: (visible) => {
+      console.log(visible);
+    },
+  });
 
   const columns = [
     {
@@ -510,7 +594,7 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
       sorter: (a, b) => a.sku1 - b.sku1,
       ...getColumnSearchProps("sku1"),
       render: (_, record) => (
-        <Link to={`/edit-sku/${record?.skuId}`}>{record?.sku1}</Link>
+        <Link to={`/edit-sku/${record?.skuid}`}>{record?.sku1}</Link>
       ),
     },
     {
@@ -592,6 +676,7 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
         return <Typography.Text>{record?.uom}</Typography.Text>;
       },
       ...getColumnSearchProps("uom"),
+      // ...getColumnsDate("uom")
     },
     {
       key: "6",
@@ -642,6 +727,16 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
       render: (_, record) => record?.iskititem,
       ...getColumnSearchProps("iskititem"),
     },
+    {
+      key: "11",
+      title: "EntryDate",
+      responsive: ["xs", "sm", "md", "lg"],
+      align: "left",
+      dataKey: "entrydate",
+      sorter: (a, b) => a.entrydate - b.entrydate,
+      render: (_, record) => record?.entrydate.substr(0, 10),
+      ...getColumnsDate("entrydate"),
+    },
   ].filter((item) => !item.hidden);
   const [activeTab, setActiveTab] = useState("1");
   const toggle = (tab) => {
@@ -683,7 +778,6 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
     setMyButton(true);
     axios({
       method: "POST",
-      // url: "https://localhost:7039/api/Sku",
       url: "http://216.230.74.17:8013/api/Sku",
       data: d,
       headers: {
@@ -704,7 +798,7 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
           clientid: "",
           cyclemonths: null,
           description: "",
-          entryDate: "2022-07-07T12:53:41.46",
+          entryDate: "",
           entryuserId: 1002,
           expDays: 365,
           expyears: null,
@@ -724,7 +818,7 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
           manufacturervendor: null,
           maxorderqty: null,
           minorderqty: null,
-          modifiedDate: "2022-07-07T12:53:41.46",
+          modifiedDate: "",
           modifiedUserId: 1002,
           mpnCode: null,
           originid: null,
@@ -836,6 +930,11 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
           <Col span={8}>
             <Checkbox value="10" style={{ marginBottom: "7px" }}>
               iskititem
+            </Checkbox>
+          </Col>
+          <Col span={8}>
+            <Checkbox value="11" style={{ marginBottom: "7px" }}>
+              EntryDate
             </Checkbox>
           </Col>
         </Checkbox.Group>
