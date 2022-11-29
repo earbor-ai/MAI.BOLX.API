@@ -61,8 +61,8 @@ const EditSkuForm = () => {
       })
       .then((res) => {
         setFormLoading(false);
-        console.log(res?.data);
-        setData(res?.data);
+        console.log(res?.data?.data);
+        setData(res?.data?.data);
         res.data?.map((d) =>
           setUtils({
             clientid: d?.clientid,

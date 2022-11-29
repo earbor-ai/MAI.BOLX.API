@@ -37,23 +37,38 @@ const KitComponent = ({ data, list }) => {
   const [deletedSuccess, setDeletedSuccess] = useState(false);
   const [concValues, setConcValues] = useState();
   const [myButton, setMyButton] = useState(false);
+  const date = new Date();
+  const currentDate =
+    date.getFullYear() +
+    "-" +
+    ("0" + (date.getMonth() + 1)).slice(-2) +
+    "-" +
+    ("0" + date.getDate()).slice(-2) +
+    "T" +
+    ("0" + date.getHours()).slice(-2) +
+    ":" +
+    ("0" + date.getMinutes()).slice(-2) +
+    ":" +
+    ("0" + (date.getSeconds() + 1)).slice(-2) +
+    "." +
+    "000";
   const [createData, setCreateData] = useState({
     uniqueid: 0,
     iteminclude: 0,
-    entrydate: "2022-09-09T07:07:11.836Z",
+    entrydate: currentDate,
     entryuserid: 1002,
     modifieduserid: 1002,
-    modifieddate: "2022-09-09T07:07:11.836Z",
+    modifieddate: currentDate,
   });
   const [editingKey, setEditingKey] = useState("");
   const [expectedData, setExpectedData] = useState({
     uniqueid: 0,
     kitskuid: `${SKUId}`,
     iteminclude: 0,
-    entrydate: "2022-09-28T06:52:47.730Z",
+    entrydate: currentDate,
     entryuserid: 1002,
     modifieduserid: 1002,
-    modifieddate: "2022-09-28T06:52:47.730Z",
+    modifieddate: currentDate,
   });
   const token = localStorage.getItem("myToken");
   const accessToken = token;
@@ -112,10 +127,10 @@ const KitComponent = ({ data, list }) => {
             componentskuid: `${newData[index].componentskuid}`,
             quantity: `${newData[index].quantity}`,
             iteminclude: 0,
-            entrydate: "2022-09-15T08:51:53.220Z",
+            entrydate: currentDate,
             entryuserid: 1002,
             modifieduserid: 1002,
-            modifieddate: "2022-09-15T08:51:53.220Z",
+            modifieddate: currentDate,
           },
           headers: {
             Accept: "*/*",
@@ -124,7 +139,7 @@ const KitComponent = ({ data, list }) => {
         })
           .then((response) => {
             setEditedSuccess(true);
-            console.log(response.data);
+            console.log(response?.data?.data);
           })
           .catch((error) => console.log(error));
       } else {
@@ -247,7 +262,8 @@ const KitComponent = ({ data, list }) => {
         Accept: "*/*",
       })
       .then((res) => {
-        setTableData(res?.data);
+        console.log(res?.data?.data?.componentskuid);
+        setTableData(res?.data?.data);
       })
       .catch((error) => {
         console.log(error);
@@ -278,6 +294,8 @@ const KitComponent = ({ data, list }) => {
     setConcValues(values);
     // const accessToken = token;
     Object.assign(expectedData, values);
+    console.log(values?.componentskuid);
+    console.log(expectedData?.componentskuid);
     setMyButton(true);
     axios({
       method: "POST",
@@ -290,23 +308,27 @@ const KitComponent = ({ data, list }) => {
       },
     })
       .then((response) => {
-        if (response?.status === 200) {
+        // if (response?.status === 200) {
+        console.log(response?.data?.data?.componentskuid);
+        if (response) {
           setSuccessModal(true);
           setMyButton(false);
-          setCreatingData(response.data);
+          setCreatingData(response?.data?.data);
           form.resetFields();
+          setErrorModal(false);
           setExpectedData({
             uniqueid: 0,
             kitskuid: `${SKUId}`,
             iteminclude: 0,
-            entrydate: "2022-09-28T06:52:47.730Z",
+            entrydate: "",
             entryuserid: 1002,
             modifieduserid: 1002,
-            modifieddate: "2022-09-28T06:52:47.730Z",
+            modifieddate: "",
             componentskuid: "",
             quantity: 0,
           });
-        } else if (values?.componentskuid === expectedData?.componentskuid) {
+          } else if (values?.componentskuid === expectedData?.componentskuid) {
+        // } else if (tableData?.componentskuid == expectedData?.componentskuid) {
           setMyButton(false);
           setErrorModal(true);
           form.resetFields();
