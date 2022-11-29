@@ -32,9 +32,11 @@ import {
   CloseCircleOutlined,
   PlusOutlined,
   SearchOutlined,
+  CloudUploadOutlined,
 } from "@ant-design/icons";
 import ViewModal from "./components/ViewModal";
 import useGetReq from "../../../customHooks/useGetReq";
+import UploadExcel from "./components/UploadExcel";
 
 const { RangePicker } = DatePicker;
 
@@ -55,22 +57,26 @@ const ECommerceDashboard = () => {
   ]);
   const [filterColumns, setFilteredColumns] = useState([]);
   const [items, setItems] = useState();
-  const [getData, cancelRequests] = useGetReq();
   const [excelVal, setExcelVal] = useState([]);
   const searchInput = useRef(null);
-  const [searchedColumn, setSearchedColumn] = useState("");
-  const [searchText, setSearchText] = useState("");
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
+  const [openUpload, setOpenUpload] = useState(false);
+  const [excelToArray, setExcelToArray] = useState();
 
+  const token = localStorage.getItem("myToken");
   useEffect(() => {
-    getData(
-      "https://localhost:7039/api/Order?clientId=1029",
-      setOrderDataSource
-    );
-
-    return cancelRequests;
-  }, []);
+    axios
+      .get(`http://216.230.74.17:8013/api/Order?clientId=1029`, {
+        headers: { Authorization: `Bearer ${token}` },
+        Accept: "*/*",
+      })
+      .then((res) => {
+        console.log(res?.data?.data);
+        setOrderDataSource(res?.data?.data);
+      })
+      .catch((error) => error.message);
+  }, [token]);
 
   const info = (e, id) => {
     Modal.info({
@@ -82,182 +88,62 @@ const ECommerceDashboard = () => {
     });
   };
 
-  // useEffect(() => {
-  //   const api = "https://localhost:7039/api/Order?clientId=1029";
-  //   axios
-  //     .get(api, {
-  //       Accept: "*/*",
-  //     })
-  //     .then((res) => {
-  //       setOrderDataSource(res.data);
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // }, []);
-
   const handleCancel = (id) => {
     setOrderIds([...orderIds, id]);
     setCancel(true);
   };
 
-  // const handlePrint = () => {
-  //   const Doc = new jsPDF();
-  //   Doc.text("Orders Details", 10, 10);
-  //   Doc.autoTable({
-  //     columns: filterColumns.map((col) => ({ ...col, dataKey: col.render })),
-  //     body: orderDataSource,
-  //   });
-  //   Doc.save("Orders.pdf");
-  // };
-
-  // const handleSearch = (selectedKeys, confirm, dataIndex) => {
-  //   confirm();
-  // };
-  // const handleReset = (clearFilters) => {
-  //   clearFilters();
-  //   setSearchText("");
-  // };
-
-  // const getColumnSearchProps = (dataIndex) => ({
-  //   filterDropdown: ({
-  //     setSelectedKeys,
-  //     selectedKeys,
-  //     confirm,
-  //     clearFilters,
-  //     close,
-  //   }) => (
-  //     <div
-  //       style={{
-  //         padding: 8,
-  //       }}
-  //     >
-  //       <Input
-  //         ref={searchInput}
-  //         placeholder={`Search ${dataIndex}`}
-  //         value={selectedKeys[0]}
-  //         onChange={(e) =>
-  //           setSelectedKeys(e.target.value ? [e.target.value] : [])
-  //         }
-  //         onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
-  //         style={{
-  //           marginBottom: 8,
-  //           display: "block",
-  //         }}
-  //       />
-  //       <Space>
-  //         <Button
-  //           type="primary"
-  //           onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
-  //           icon={<SearchOutlined />}
-  //           size="small"
-  //           style={{
-  //             width: 90,
-  //           }}
-  //         >
-  //           Search
-  //         </Button>
-  //         <Button
-  //           onClick={() => clearFilters && handleReset(clearFilters)}
-  //           size="small"
-  //           style={{
-  //             width: 90,
-  //           }}
-  //         >
-  //           Reset
-  //         </Button>
-  //         <Button
-  //           type="link"
-  //           size="small"
-  //           onClick={() => {
-  //             confirm({
-  //               closeDropdown: false,
-  //             });
-  //             setSearchText(selectedKeys[0]);
-  //             setSearchedColumn(dataIndex);
-  //           }}
-  //         >
-  //           Filter
-  //         </Button>
-  //         <Button
-  //           type="link"
-  //           size="small"
-  //           onClick={() => {
-  //             confirm({
-  //               closeDropdown: true,
-  //             });
-  //           }}
-  //         >
-  //           close
-  //         </Button>
-  //       </Space>
-  //     </div>
-  //   ),
-  //   filterIcon: (filtered) => (
-  //     <SearchOutlined
-  //       style={{
-  //         color: filtered ? "#1890ff" : undefined,
-  //       }}
-  //     />
-  //   ),
-  //   onFilter: (value, record) =>
-  //     record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-  //   onFilterDropdownOpenChange: (visible) => {
-  //     console.log(visible);
-  //     if (visible) {
-  //       setTimeout(() => searchInput.current?.select(), 100);
-  //     }
-  //   },
-  // });
 
   const columns = [
     {
       key: "1",
       title: "Order#",
       responsive: ["xs", "sm", "md", "lg"],
-      dataKey: "orderId",
+      dataKey: "orderid",
       align: "left",
       render: (_, record) => (
-        <Typography.Text>{record?.orderId}</Typography.Text>
+        <Typography.Text>{record?.orderid}</Typography.Text>
       ),
     },
     {
       key: "2",
       title: "Customer Order#",
       responsive: ["xs", "sm", "md", "lg"],
-      dataKey: "customerOrderId",
+      dataKey: "custorderid",
       align: "left",
       render: (_, record) => (
-        <Typography.Text>{record?.customerOrderId}</Typography.Text>
+        <Typography.Text>{record?.custorderid}</Typography.Text>
       ),
       showOnResponse: true,
     },
     {
       key: "3",
       title: "Order Status",
-      dataKey: "orderStatus",
+      dataKey: "orderstatus",
       responsive: ["xs", "sm", "md", "lg"],
       align: "left",
       render: (_, record) => (
         <>
-          {orderIds.includes(record?.orderId) ? (
+          {orderIds.includes(record?.orderid) ? (
             <Tag color="yellow">Cancelled</Tag>
           ) : (
             <Tag
               color={
-                record.orderStatus === "NEW"
+                record.orderstatus === "NEW"
                   ? "blue"
-                  : record.orderStatus === "Open"
+                  : record.orderstatus === "Open"
                   ? "green"
+                  : record.orderstatus === "Cancel"
+                  ? "yellow"
                   : null
               }
             >
-              <Typography.Text>{record?.orderStatus}</Typography.Text>
+              <Typography.Text>{record?.orderstatus}</Typography.Text>
             </Tag>
           )}
         </>
       ),
-      sorter: (a, b) => a.orderStatus - b.orderStatus,
+      sorter: (a, b) => a.orderstatus - b.orderstatus,
       // ...getColumnSearchProps("orderStatus"),
     },
     {
@@ -268,7 +154,7 @@ const ECommerceDashboard = () => {
       align: "left",
       render: (_, record) => (
         <Typography.Text>
-          {record?.orderShipments[0]?.shipCustomerName}
+          {record?.ordersshipments[0]?.shipcustomername}
         </Typography.Text>
       ),
       hidden: false,
@@ -276,35 +162,35 @@ const ECommerceDashboard = () => {
     {
       key: "5",
       title: "City/State",
-      dataKey: "shipState",
+      dataKey: "shipstate",
       responsive: ["xs", "sm", "md", "lg"],
       align: "left",
       render: (_, record) => (
         <Typography.Text>
-          {record?.orderShipments[0]?.shipCity}/
-          {record?.orderShipments[0]?.shipState}
+          {record?.ordersshipments[0]?.shipcity}/
+          {record?.ordersshipments[0]?.shipstate}
         </Typography.Text>
       ),
     },
     {
       key: "6",
       title: "Order Creation Date",
-      dataKey: "orderDate",
+      dataKey: "orderdate",
       responsive: ["xs", "sm", "md", "lg"],
       align: "left",
       render: (_, record) => (
-        <Typography.Text>{record?.orderDate}</Typography.Text>
+        <Typography.Text>{record?.orderdate}</Typography.Text>
       ),
-      sorter: (a, b) => a.sku1?.length - b.sku1?.length,
+      // sorter: (a, b) => a.sku1?.length - b.sku1?.length,
     },
     {
       key: "7",
       title: "Ship Cost",
-      dataKey: "shipCost",
+      dataKey: "ordershipcost",
       responsive: ["xs", "sm", "md", "lg"],
       align: "left",
       render: (_, record) => (
-        <Typography.Text>{record?.shipCost}</Typography.Text>
+        <Typography.Text>{record?.ordershipcost}</Typography.Text>
       ),
     },
     {
@@ -322,13 +208,13 @@ const ECommerceDashboard = () => {
       hidden: false,
       render: (_, record) => (
         <>
-          {record?.orderStatus === "Cancel" ? (
+          {record?.orderstatus === "Cancel" ? (
             <Space size="small">
               <Tooltip title="View">
                 <EyeOutlined
                   style={{ cursor: "pointer" }}
                   onClick={(e) => {
-                    info(e, record?.orderId);
+                    info(e, record?.orderid);
                   }}
                 />
               </Tooltip>
@@ -336,19 +222,19 @@ const ECommerceDashboard = () => {
           ) : (
             <Space size="small">
               <>
-                {orderIds.includes(record?.orderId) ? (
+                {orderIds.includes(record?.orderid) ? (
                   <Tooltip title="View">
                     <EyeOutlined
                       style={{ cursor: "pointer" }}
                       onClick={(e) => {
-                        info(e, record?.orderId);
+                        info(e, record?.orderid);
                       }}
                     />
                   </Tooltip>
                 ) : (
                   <>
                     <Tooltip title="Edit" color="#108ee9" key="#108ee9">
-                      <Link to={`/editOrder/${record?.orderId}`}>
+                      <Link to={`/editOrder/${record?.orderid}`}>
                         <EditOutlined
                           style={{ color: "blue", cursor: "pointer" }}
                         />
@@ -356,7 +242,7 @@ const ECommerceDashboard = () => {
                     </Tooltip>
                     <Popconfirm
                       title="Sure to cancel order?"
-                      onConfirm={() => handleCancel(record?.orderId)}
+                      onConfirm={() => handleCancel(record?.orderid)}
                     >
                       <CloseCircleOutlined
                         style={{ color: "red", cursor: "pointer" }}
@@ -371,6 +257,94 @@ const ECommerceDashboard = () => {
       ),
     },
   ];
+
+  function processExcel(data) {
+    const workbook = XLSX.read(data, { type: "binary" });
+    const firstSheet = workbook.SheetNames[0];
+    const excelRows = XLSX.utils.sheet_to_row_object_array(
+      workbook.Sheets[firstSheet]
+    );
+
+    const result = Object.values(
+      excelRows.reduce(
+        (
+          c,
+          {
+            PONumber,
+            ShiptoCity,
+            Qty,
+            ItemNo,
+            ClientID,
+            ShipVia,
+            ShiptoAddress1,
+            ShiptoCountry,
+            ShiptoName,
+            ShiptoPhone,
+            ShiptoState,
+            ShiptoZip,
+            Shiptoemail,
+          }
+        ) => {
+          c[PONumber] = c[PONumber] || {
+            PONumber,
+            ShiptoCity,
+            ClientID,
+            ShipVia,
+            ShiptoAddress1,
+            ShiptoCountry,
+            ShiptoName,
+            ShiptoPhone,
+            ShiptoState,
+            ShiptoZip,
+            Shiptoemail,
+            orderitems: [],
+          };
+          c[PONumber].orderitems = c[PONumber].orderitems.concat({
+            skuid: 3141,
+            orderqty: Qty,
+            bkoqty: 0,
+            shipqty: 0,
+            cancelqty: 0,
+            itemcost: 0,
+            extitemcost: 0,
+            manifestid: null,
+            locationid: null,
+            returnqty: null,
+            sku: {
+              skuid: 3141,
+              sku1: "WF-418",
+              description:
+                "CATOLICISMO: GUIA PARA FACILITADORES Y HOJA DE RESPUESTAS",
+              status: "Active",
+            },
+          });
+          return c;
+        },
+        {}
+      )
+    );
+    setExcelToArray(result);
+  }
+
+  function excelUpload() {
+    const fileUpload = document.getElementById("fileUpload");
+    const regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
+    if (regex.test(fileUpload?.value.toLowerCase())) {
+      if (typeof FileReader !== "undefined") {
+        const reader = new FileReader();
+        if (reader.readAsBinaryString) {
+          reader.onload = (e) => {
+            processExcel(reader.result);
+          };
+          reader.readAsBinaryString(fileUpload.files[0]);
+        }
+      } else {
+        console.log("This browser does not support HTML5.");
+      }
+    } else {
+      console.log("Please upload a valid Excel file.");
+    }
+  }
 
   useEffect(() => {
     let groupedSubItems = [];
@@ -395,12 +369,9 @@ const ECommerceDashboard = () => {
     Doc.save("Orders.pdf");
   };
 
-  // console.log(orderDataSource);
-
   const onChange = (checkedValues) => {
     setDefaultValues(checkedValues);
   };
-  console.log(defaultValue);
 
   const menu = (
     <Menu>
@@ -473,21 +444,6 @@ const ECommerceDashboard = () => {
     setFilteredColumns(clmns);
   }, [orderDataSource, defaultValue]);
 
-  // useEffect(() => {
-  //   filterColumns.map((d) => {
-  //     const keys = d?.dataKey;
-  //     excelVal.push(keys);
-  //   });
-
-  //   items?.forEach((e) => {
-  //     Object.keys(e).forEach(
-  //       (key) => excelVal.includes(key) || delete e[key]
-  //     );
-  //   });
-
-  //   console.log(items);
-  // }, [items, filterColumns]);
-  // console.log(items);
 
   const getDateRange = (date, dateString) => {
     console.log(date, dateString);
@@ -533,98 +489,128 @@ const ECommerceDashboard = () => {
     setFilteredTable(filterTable);
   };
 
+  const openFileUpload = () => {
+    setOpenUpload(true);
+  };
+  const onBackClick = () => {
+    setOpenUpload(false);
+  };
+
   return (
     <Container className="dashboard">
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: "-15px",
-          marginBottom: "6px",
-        }}
-      >
-        <h3 className="page-title">Order Management</h3>
-        <Link to="/createOrder">
-          <Button type="primary">
-            <PlusOutlined style={{ marginTop: "-3px" }} />
-            Create New Order
-          </Button>
-        </Link>
-      </div>
-      <Row>
-        <Col md={12} xl={12} lg={6} sm={12} xs={12}>
-          <Card style={{ backgroundColor: "white", padding: "10px" }}>
-            {/* <div ref={componentRef}> */}
-            <Table
-              columns={filterColumns}
-              dataSource={
-                filteredTable?.length > 0 ? filteredTable : orderDataSource
-              }
-              size="small"
-              title={() => (
-                <>
-                  <div className="header__section">
-                    <div>
-                      {orderDataSource?.length > 0 ? (
-                        <Space>
-                          <Tooltip placement="bottom" title="Export to PDF">
-                            <PdfIcon
-                              style={{ color: "red", cursor: "pointer" }}
-                              onClick={handlePrint}
-                            />
-                          </Tooltip>
-                          <Tooltip placement="bottom" title="Export to Excel">
-                            <FileExcelIcon
-                              style={{ color: "green", cursor: "pointer" }}
-                              onClick={handleClick}
-                            />
-                          </Tooltip>
-                          <AutoComplete
-                            style={{
-                              width: "10em",
-                              marginRight: "10px",
-                            }}
-                            enterButton="search"
-                            onSearch={search}
-                            placeholder="Search by ...."
-                          />
-                        </Space>
-                      ) : null}
-                    </div>
-                    <div className="search__input">
-                      <div>
-                        <RangePicker
-                          style={{ marginRight: "10px" }}
-                          onChange={getDateRange}
-                        />
-                        <Dropdown overlay={menu} arrow>
-                          <Button>
+      {openUpload ? (
+        <UploadExcel
+          excelUpload={excelUpload}
+          excelToArray={excelToArray}
+          onBackClick={onBackClick}
+        />
+      ) : (
+        <>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginTop: "-15px",
+              marginBottom: "6px",
+            }}
+          >
+            <h3 className="page-title">Order Management</h3>
+            <div>
+              <Button
+                type="button"
+                onClick={openFileUpload}
+                style={{ marginRight: "10px" }}
+              >
+                <CloudUploadOutlined />
+                Upload File
+              </Button>
+              <Link to="/createOrder">
+                <Button type="primary">
+                  <PlusOutlined style={{ marginTop: "-3px" }} />
+                  Create New Order
+                </Button>
+              </Link>
+            </div>
+          </div>
+          <Row>
+            <Col md={12} xl={12} lg={6} sm={12} xs={12}>
+              <Card style={{ backgroundColor: "white", padding: "10px" }}>
+                {/* <div ref={componentRef}> */}
+                <Table
+                  columns={filterColumns}
+                  dataSource={
+                    filteredTable?.length > 0 ? filteredTable : orderDataSource
+                  }
+                  size="small"
+                  title={() => (
+                    <>
+                      <div className="header__section">
+                        <div>
+                          {orderDataSource?.length > 0 ? (
                             <Space>
-                              Columns
-                              <DownOutlined />
+                              <Tooltip placement="bottom" title="Export to PDF">
+                                <PdfIcon
+                                  style={{ color: "red", cursor: "pointer" }}
+                                  onClick={handlePrint}
+                                />
+                              </Tooltip>
+                              <Tooltip
+                                placement="bottom"
+                                title="Export to Excel"
+                              >
+                                <FileExcelIcon
+                                  style={{ color: "green", cursor: "pointer" }}
+                                  onClick={handleClick}
+                                />
+                              </Tooltip>
+                              <AutoComplete
+                                style={{
+                                  width: "10em",
+                                  marginRight: "10px",
+                                }}
+                                enterButton="search"
+                                onSearch={search}
+                                placeholder="Search by ...."
+                              />
                             </Space>
-                          </Button>
-                        </Dropdown>
+                          ) : null}
+                        </div>
+                        <div className="search__input">
+                          <div>
+                            <RangePicker
+                              style={{ marginRight: "10px" }}
+                              onChange={getDateRange}
+                            />
+                            <Dropdown overlay={menu} arrow>
+                              <Button>
+                                <Space>
+                                  Columns
+                                  <DownOutlined />
+                                </Space>
+                              </Button>
+                            </Dropdown>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </>
-              )}
-              bordered
-              pagination={{
-                defaultPageSize: 15,
-                showSizeChanger: true,
-                pageSizeOptions: ["15", "20", "30", "50", "100"],
-              }}
-              style={{ marginTop: "15px" }}
-              stripes="even"
-              locale={locale}
-            />
-            {/* </div> */}
-          </Card>
-        </Col>
-      </Row>
+                    </>
+                  )}
+                  bordered
+                  pagination={{
+                    defaultPageSize: 15,
+                    showSizeChanger: true,
+                    pageSizeOptions: ["15", "20", "30", "50", "100"],
+                  }}
+                  style={{ marginTop: "15px" }}
+                  stripes="even"
+                  locale={locale}
+                />
+                {/* </div> */}
+              </Card>
+            </Col>
+          </Row>
+        </>
+      )}
     </Container>
   );
 };

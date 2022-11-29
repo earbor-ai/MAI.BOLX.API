@@ -312,6 +312,9 @@ const CreateOrders = () => {
 
   return (
     <Col md={12} lg={12}>
+      <p style={{ float: "right", marginBottom: "10px", marginTop: "-15px" }}>
+        Create Order / Order Management
+      </p>
       {success && createdOrderId ? (
         <SweetAlert
           success

@@ -71,6 +71,18 @@ const FinanceDashboard = ({ dispatch, cryptoTable, rtl, theme }) => {
   }, [token]);
   // console.log(data);
 
+  useEffect(() => {
+    axios
+      .get(`http://216.230.74.17:8013/api/Order?clientId=1029`, {
+        headers: { Authorization: `Bearer ${token}` },
+        Accept: "*/*",
+      })
+      .then((res) => {
+        console.log(res.data);
+      })
+      .catch((error) => error.message);
+  }, [token]);
+
   const clickOrdersCard = (e) => {
     setActive((prevState) => !prevState);
     setSelected(1);

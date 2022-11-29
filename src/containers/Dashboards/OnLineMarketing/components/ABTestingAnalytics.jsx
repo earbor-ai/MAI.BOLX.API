@@ -522,7 +522,7 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
       close,
     }) => {
       const changingDate = (date, dateString) => {
-        setZeroData(dateString)
+        setZeroData(dateString);
         setSelectedKeys(
           dateString !== ""
             ? tableSkuData.filter(
@@ -541,7 +541,7 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
             }}
           >
             <Space direction="horizontal">
-              <RangePicker onChange={changingDate}/>
+              <RangePicker onChange={changingDate} />
             </Space>
             <Space>
               <Button

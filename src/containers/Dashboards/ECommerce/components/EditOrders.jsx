@@ -35,6 +35,8 @@ const EditOrders = () => {
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   // console.log(resData);
 
+ const token = localStorage.getItem("myToken");
+
   const nextPage = () => {
     setPage(page + 1);
     setCurrent(current + 1);
@@ -201,6 +203,9 @@ const EditOrders = () => {
 
   return (
     <Col md={12} lg={12}>
+       <p style={{ float: "right", marginBottom: "10px", marginTop: "-15px" }}>
+        Update Order / Order Management
+      </p>
       {isSucess ? (
         <SweetAlert
           success

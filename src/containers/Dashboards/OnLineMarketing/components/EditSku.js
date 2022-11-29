@@ -24,7 +24,7 @@ import EditSkuForm from "./EditSkuForm";
 
 const EditSku = () => {
   const { SKUId } = useParams();
-  console.log(SKUId)
+  console.log(SKUId);
   const history = useHistory();
   const [list, setList] = useState();
   const [data, setData] = useState();
@@ -36,13 +36,13 @@ const EditSku = () => {
     if (activeTab !== tab) setActiveTab(tab);
   };
   console.log(list);
-  //const token =
-  //"eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidGVzdCIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSIsImV4cCI6IjE2NTc2OTY1NDIiLCJuYmYiOiIxNjU3NjEwMTQyIn0";
+  // const token =
+  // "eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidGVzdCIsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSIsImV4cCI6IjE2NTc2OTY1NDIiLCJuYmYiOiIxNjU3NjEwMTQyIn0";
   const cookies = new Cookies();
   const token = localStorage.getItem("myToken");
-  console.log(token)
+  console.log(token);
   useEffect(() => {
-    const accessToken =token;
+    const accessToken = token;
     const abortController = new AbortController();
     // const SingleClientID = cookies.get("clientId");
     // const api = `http://216.230.74.17:7039/api/Sku?clientId=${1029}&skuId=${SKUId}`;
@@ -54,10 +54,13 @@ const EditSku = () => {
     axios
       .get(api, {
         Accept: "*/*",
-        headers: { Authorization: `Bearer ${accessToken}`, "Access-Control-Allow-Origin": "*" },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Access-Control-Allow-Origin": "*",
+        },
       })
       .then((res) => {
-        console.log(res?.data)
+        console.log(res?.data);
         setData(res?.data);
       })
       .catch((error) => {
@@ -81,10 +84,13 @@ const EditSku = () => {
     axios
       .get(api, {
         Accept: "*/*",
-        headers: { Authorization: `Bearer ${accessToken}`,"Access-Control-Allow-Origin": "*" }
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Access-Control-Allow-Origin": "*",
+        },
       })
       .then((res) => {
-        console.log(res?.data)
+        console.log(res?.data);
         setList(res?.data);
         console.log(res?.data);
       })
@@ -99,7 +105,7 @@ const EditSku = () => {
     <div>
       {data?.map((d) => (
         <div key={d?.clientid}>
-         <Col sm={12} md={12} lg={12} xl={12}>
+          <Col sm={12} md={12} lg={12} xl={12}>
             {/* <h5>Update SKU</h5> */}
             <Card style={{ minHeight: "500px" }}>
               <CardBody className="tabs tabs--bordered-top">
@@ -151,7 +157,7 @@ const EditSku = () => {
                         style={{
                           backgroundColor: "rgb(36 32 32 / 51%)",
                           borderColor: "rgb(36 32 32 / 51%)",
-                          color: "white"
+                          color: "white",
                         }}
                         onClick={BackToPage}
                       >

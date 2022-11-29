@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Switch } from "antd";
+import { Button, Switch, Radio } from "antd";
 import moment from "moment";
 import PropTypes from "prop-types";
 import {
@@ -413,9 +413,55 @@ const BtcEth = ({ theme, dir, name, data }) => {
         if (e?.id === day.getDay()) {
           weeklyArray[i].orders = e2[1];
           weeklyArray[6].orders = 0;
-          weeklyArray[2].orders = 0;
+          // weeklyArray[2].orders = 0;
           weeklyArray[3].orders = 0;
           weeklyArray[5].orders = 0;
+          weeklyArray[3].orders = 0;
+        }
+        if (day.getDay() === 0) {
+          setWeeklyArray([
+            {
+              id: 0,
+              day: "Sunday",
+              orders: 0,
+            },
+            {
+              id: 1,
+              day: "Monday",
+              orders: 0,
+              date: "",
+            },
+            {
+              id: 2,
+              day: "Tuesday",
+              orders: 0,
+              date: "",
+            },
+            {
+              id: 3,
+              day: "Wednesday",
+              orders: 0,
+              date: "",
+            },
+            {
+              id: 4,
+              day: "Thursday",
+              orders: 0,
+              date: "",
+            },
+            {
+              id: 5,
+              day: "Friday",
+              orders: 0,
+              date: "",
+            },
+            {
+              id: 6,
+              day: "Saturday",
+              orders: 0,
+              date: "",
+            },
+          ]);
         }
       })
     );
@@ -522,6 +568,19 @@ const BtcEth = ({ theme, dir, name, data }) => {
               year
             </Button>
           </div>
+          {/* <Radio.Group
+            defaultValue="a"
+            buttonStyle="solid"
+            size="small"
+            style={{
+              marginTop: 16,
+            }}
+          >
+            <Radio.Button value="a">Day</Radio.Button>
+            <Radio.Button value="b">Week</Radio.Button>
+            <Radio.Button value="c">Month</Radio.Button>
+            <Radio.Button value="d">Year</Radio.Button>
+          </Radio.Group> */}
           <div style={{ display: "flex", flexDirection: "row" }}>
             <p>Show in Barchart</p>
             <Switch

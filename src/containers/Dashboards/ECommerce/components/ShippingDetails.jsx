@@ -217,7 +217,6 @@ const ShippingDetails = ({
             </Form.Label>
             <Form.Control
               name="customerOrderId"
-              type="number"
               placeholder="Enter Order No..."
               size="sm"
               style={{ borderColor: "#70bbfd" }}
