@@ -60,8 +60,8 @@ const EditSku = () => {
         },
       })
       .then((res) => {
-        console.log(res?.data);
-        setData(res?.data);
+        console.log(res?.data?.data);
+        setData(res?.data?.data);
       })
       .catch((error) => {
         console.log(error);
@@ -90,8 +90,8 @@ const EditSku = () => {
         },
       })
       .then((res) => {
-        console.log(res?.data);
-        setList(res?.data);
+        console.log(res?.data?.data);
+        setList(res?.data?.data);
         console.log(res?.data);
       })
       .catch((error) => {

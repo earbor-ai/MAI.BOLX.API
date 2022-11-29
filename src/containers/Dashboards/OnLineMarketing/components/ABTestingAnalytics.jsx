@@ -116,7 +116,6 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
     clientid: "",
     cyclemonths: null,
     description: "",
-    // entryDate: "2022-07-07T12:53:41.46",
     entryDate: currentDate,
     entryuserId: 1002,
     expDays: 365,
@@ -212,25 +211,28 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
   };
   // to get dataSource
   const token = localStorage.getItem("myToken");
+  // const token = JSON.parse(localStorage.getItem("myToken"));
+  console.log(token);
   useEffect(() => {
-    // setShowTable(true);
-    console.log(token);
+    // setShowTable(true)
     const accessToken = token;
     console.log(accessToken);
     const api = `http://216.230.74.17:8013/api/Sku?clientId=1029`;
     // const api = `https://localhost:7039/api/Sku?clientId=${1029}`;
     setMyLoading(true);
     setSelectLoading(true);
-    console.log(accessToken);
     axios
       .get(api, {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json",
+        },
       })
       .then((res) => {
-        console.log(res?.data);
-        // setSkeletonLoading(false);
-        setAllSkuData(res?.data);
-        setTableSkuData(res?.data);
+        console.log(res?.data?.data);
+        setAllSkuData(res?.data?.data);
+        setTableSkuData(res?.data?.data);
         setMyLoading(false);
         setSelectLoading(false);
       })
@@ -511,7 +513,6 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
   };
   const HandleDateSetting = (clearFilters) => {
     clearFilters();
-    // setZeroData("");
   };
   const getColumnsDate = (dataIndex) => ({
     filterDropdown: ({
@@ -522,7 +523,6 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
       close,
     }) => {
       const changingDate = (date, dateString) => {
-        setZeroData(dateString);
         setSelectedKeys(
           dateString !== ""
             ? tableSkuData.filter(
@@ -553,17 +553,6 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
               >
                 Filter
               </Button>
-              {/* <Button
-                onClick={() => {
-                  clearFilters && HandleDateSetting(clearFilters);
-                }}
-                size="small"
-                style={{
-                  width: 90,
-                }}
-              >
-                Reset
-              </Button> */}
             </Space>
           </div>
         </>
