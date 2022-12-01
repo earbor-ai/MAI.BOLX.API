@@ -11,6 +11,7 @@ import RegisterPhoto from '../../Account/RegisterPhoto/index';
 import ResetPassword from '../../Account/ResetPassword/index';
 import ResetPasswordPhoto from '../../Account/ResetPasswordPhoto';
 import WrappedRoutes from './WrappedRoutes';
+import ClientSelect from '../../Dashboards/ClientSelect/ClientSelect';
 
 const Router = () => (
   <MainWrapper>
@@ -20,6 +21,7 @@ const Router = () => (
         {/* <Route path="/404" component={NotFound404} /> */}
         {/* <Route path="/lock_screen" component={LockScreen} /> */}
         <Route path="/log_in" component={LogIn} />
+        <Route path="/select_client" component={ClientSelect} />
         <Route path="/log_in_photo" component={LogInPhoto} />
         <Route path="/register" component={Register} />
         <Route path="/register_photo" component={RegisterPhoto} />

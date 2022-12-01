@@ -18,9 +18,9 @@ const TopbarProfile = ({ user }) => {
   };
 
   const logout = () => {
-    // localStorage.removeItem('easydev');
-    cookies.remove('myToken', { path: '/' });
-    cookies.remove("refreshTok", { path: '/' });
+    localStorage.removeItem('myToken');
+    localStorage.removeItem('refreshTok');
+    localStorage.removeItem('clientId');
     logoutAuth0();
   };
 
@@ -33,7 +33,7 @@ const TopbarProfile = ({ user }) => {
           alt="avatar"
         />
         <p className="topbar__avatar-name">
-          {user && user.fullName}
+          Word on Fire
         </p>
         <DownIcon className="topbar__icon" />
       </button>

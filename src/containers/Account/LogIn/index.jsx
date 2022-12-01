@@ -38,7 +38,7 @@ const LogIn = ({ changeIsOpenModalFireBase }) => {
           console.log(response.data.token);
           setLoading(false);
           if (response.data.token) {
-            history.push("/finance_dashboard");
+            history.push("/select_client");
           }
           if (response.data.status === 400) {
             setErrorMessage("Invalid credentials please check");

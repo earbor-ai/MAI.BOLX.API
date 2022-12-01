@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   Button,
-  Card,
   Checkbox,
   Col,
   Form,
@@ -11,7 +10,7 @@ import {
   Table,
   Typography,
 } from "antd";
-import { CardBody } from "reactstrap";
+import { CardBody, Card } from "reactstrap";
 import axios from "axios";
 // import { mdiChartBar } from '@mdi/js';
 function FitnessDashboard() {
@@ -138,113 +137,127 @@ function FitnessDashboard() {
     console.log(selectedValues);
   };
   return (
-    <Col
-      sm={12}
-      md={12}
-      lg={12}
-      xl={12}
-      style={{ paddingRight: "0px", paddingLeft: "20px", paddingTop: "40px" }}
-    >
-      <Card style={{ minHeight: "500px", minWidth: "100em" }}>
-        <div>
-          <mdiChartBar />
-          <h5>Inventory Reports</h5>
-          <hr />
-        </div>
-
-        <Form
-          name="customized_form_controls"
-          layout="inline"
-          onFinish={Finishing}
-          // labelCol={{
-          //   span: 8,
-          // }}
-          wrapperCol={{
-            span: 50,
-          }}
-          initialValues={{
-            remember: true,
-          }}
-        >
-          <Form.Item>
-            <div>
-              <strong>SKU</strong>
-            </div>
-            <Select
-              placeholder="Select SKU's"
-              optionFilterProp="children"
-              style={{ width: "20em", marginBottom: "0px" }}
-              onChange={skuValues}
-              onSelect={selectedValues}
-            >
-              <option value="">Select SKU's</option>
-              {mySKus?.map((ourskus) => {
-                return <option value={ourskus?.sku1}>{ourskus?.sku1}</option>;
-              })}
-            </Select>
-          </Form.Item>
-          <Form.Item>
-            <Col>
-              <div>
-                <strong>Description</strong>
-              </div>
-              <Input />
-            </Col>
-          </Form.Item>
-          <Form.Item>
-            <Col>
-              <div>
-                <strong>Lot Code</strong>
-              </div>
-              <Input />
-            </Col>
-          </Form.Item>
-          <Form.Item>
-            <Col style={{ paddingTop: "20px" }}>
-              <Button
-                type="primary"
-                htmlType="submit"
-                style={{ backgroundColor: "#20c997", borderColor: "#20c997" }}
-                onClick={showDataTable}
-              >
-                search
-              </Button>
-            </Col>
-          </Form.Item>
-          <Form.Item>
-            <Col style={{ paddingTop: "20px" }}>
-              <Button
-                type="primary"
-                htmlType="submit"
-                style={{ backgroundColor: "#20c997", borderColor: "#20c997" }}
-              >
-                clear
-              </Button>
-            </Col>
-          </Form.Item>
-        </Form>
-        {tableShowing ? (
-          <>
-            <Table
-              columns={columns}
-              bordered
-              scroll={{ x: true }}
-              dataSource={skuTableData}
-              sortDirections={["descend", "ascend"]}
-              size="small"
-              pagination={{
-                defaultPageSize: 50,
-                showSizeChanger: true,
-                pageSizeOptions: ["50"],
-              }}
-              style={{ marginTop: "9px" }}
-              stripes="even"
-              // loading={myLoading}
-            />
-          </>
-        ) : null}
-      </Card>
-    </Col>
+    <div style={{ marginTop: "-15px" }}>
+      <div>
+        <Row>
+          <Card
+            style={{
+              backgroundColor: "white",
+              padding: "10px",
+              minHeight: "350px",
+            }}
+          >
+            <CardBody className="tabs tabs--bordered-top">
+              <Col md={12} xl={12} lg={6} sm={12} xs={12}>
+                <Form
+                  name="customized_form_controls"
+                  layout="inline"
+                  onFinish={Finishing}
+                  // labelCol={{
+                  //   span: 8,
+                  // }}
+                  wrapperCol={{
+                    span: 50,
+                  }}
+                  initialValues={{
+                    remember: true,
+                  }}
+                >
+                  <div style={{ display: "flex" }}>
+                    <Form.Item>
+                      <div>
+                        <strong>SKU</strong>
+                      </div>
+                      <Select
+                        placeholder="Select SKU's"
+                        optionFilterProp="children"
+                        style={{ width: "20em", marginBottom: "0px" }}
+                        onChange={skuValues}
+                        onSelect={selectedValues}
+                      >
+                        <option value="">Select SKU&apos;s</option>
+                        {mySKus?.map((ourskus) => {
+                          return (
+                            <option value={ourskus?.sku1}>
+                              {ourskus?.sku1}
+                            </option>
+                          );
+                        })}
+                      </Select>
+                    </Form.Item>
+                    <Form.Item>
+                      <Col>
+                        <div>
+                          <strong>Description</strong>
+                        </div>
+                        <Input />
+                      </Col>
+                    </Form.Item>
+                    <Form.Item>
+                      <Col>
+                        <div>
+                          <strong>Lot Code</strong>
+                        </div>
+                        <Input />
+                      </Col>
+                    </Form.Item>
+                    <Form.Item>
+                      <Col style={{ paddingTop: "20px" }}>
+                        <Button
+                          type="primary"
+                          htmlType="submit"
+                          style={{
+                            backgroundColor: "#20c997",
+                            borderColor: "#20c997",
+                          }}
+                          onClick={showDataTable}
+                        >
+                          search
+                        </Button>
+                      </Col>
+                    </Form.Item>
+                    <Form.Item>
+                      <Col style={{ paddingTop: "20px" }}>
+                        <Button
+                          type="primary"
+                          htmlType="submit"
+                          style={{
+                            backgroundColor: "#20c997",
+                            borderColor: "#20c997",
+                          }}
+                        >
+                          clear
+                        </Button>
+                      </Col>
+                    </Form.Item>
+                  </div>
+                </Form>
+                {tableShowing ? (
+                  <>
+                    <Table
+                      columns={columns}
+                      bordered
+                      scroll={{ x: true }}
+                      dataSource={skuTableData}
+                      sortDirections={["descend", "ascend"]}
+                      size="small"
+                      pagination={{
+                        defaultPageSize: 50,
+                        showSizeChanger: true,
+                        pageSizeOptions: ["50"],
+                      }}
+                      style={{ marginTop: "9px" }}
+                      stripes="even"
+                      // loading={myLoading}
+                    />
+                  </>
+                ) : null}
+              </Col>
+            </CardBody>
+          </Card>
+        </Row>
+      </div>
+    </div>
   );
 }
 

@@ -42,43 +42,22 @@ const FinanceDashboard = ({ dispatch, cryptoTable, rtl, theme }) => {
   const [clickedName, setClickedName] = useState("");
   const [dates, setDates] = useState();
   const [getData, cancelRequests] = useGetReq();
-
-  const cookies = new Cookies();
   const token = localStorage.getItem("myToken");
+  const id = localStorage.getItem("clientId");
   console.log(token);
-
+  
   useEffect(() => {
+    if (active) {
+      setClickedName("TOTAL ORDERS");
+    }
     axios
-      .get(`http://216.230.74.17:8013/api/Sku?clientId=1029`, {
+      .get(`http://216.230.74.17:8013/api/Order?clientId=${id}`, {
         headers: { Authorization: `Bearer ${token}` },
         Accept: "*/*",
       })
       .then((res) => {
         console.log(res.data);
-      })
-      .catch((error) => error.message);
-  }, [token]);
-  useEffect(() => {
-    axios
-      .get(`http://216.230.74.17:8013/api/SkuKitMapping?clientId=1029`, {
-        headers: { Authorization: `Bearer ${token}` },
-        Accept: "*/*",
-      })
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((error) => error.message);
-  }, [token]);
-  // console.log(data);
-
-  useEffect(() => {
-    axios
-      .get(`http://216.230.74.17:8013/api/Order?clientId=1029`, {
-        headers: { Authorization: `Bearer ${token}` },
-        Accept: "*/*",
-      })
-      .then((res) => {
-        console.log(res.data);
+        setData(res.data.data);
       })
       .catch((error) => error.message);
   }, [token]);
@@ -116,28 +95,8 @@ const FinanceDashboard = ({ dispatch, cryptoTable, rtl, theme }) => {
     setClickedName("ON TIME DELIVERY");
   };
 
-  useEffect(() => {
-    if (active) {
-      setClickedName("TOTAL ORDERS");
-    }
-    getData(`${BASE_URL}/api/Order?clientId=1029`, setData);
-    return cancelRequests;
-  }, []);
-
-  // useEffect(() => {
-  //   const d = data?.map((elm) => elm?.orderDate?.toString()?.substring(0, 10));
-  //   setDates(d);
-  // }, [data]);
-
-  // console.log(dates);
 
   console.log(data);
-  // const
-
-  // const date = moment(data?.orderDate, "YYYY-MM-DD HH:mm:ss").format(
-  //   "DD-MM-YYYY"
-  // );
-  // console.log(date);
 
   const [name, setName] = useState({
     BTC: "BTC",

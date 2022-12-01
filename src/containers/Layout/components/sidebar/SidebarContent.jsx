@@ -1,12 +1,15 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import SidebarLink from './SidebarLink';
-import SidebarCategory from './SidebarCategory';
+import React from "react";
+import PropTypes from "prop-types";
+import SidebarLink from "./SidebarLink";
+import SidebarCategory from "./SidebarCategory";
 
 const Ava1 = `../../${process.env.PUBLIC_URL}/img/logo-dark.png`;
 
 const SidebarContent = ({
-  onClick, changeToLight, changeToDark, sidebarCollapse,
+  onClick,
+  changeToLight,
+  changeToDark,
+  sidebarCollapse,
 }) => (
   <div className="sidebar__content">
     <ul className="sidebar__block">
@@ -40,20 +43,23 @@ const SidebarContent = ({
         route="/online_marketing_dashboard"
         onClick={onClick}
       />
-      <SidebarLink
+      {/* <SidebarLink
         title="Inventory Reports"
-        icon="heart-pulse"
+        icon="layers"
         route="/fitness_dashboard"
         onClick={onClick}
-      />
-      {/* <SidebarCategory title="Layout" icon="layers" sidebarCollapse={sidebarCollapse}>
-        <button className="sidebar__link" type="button" onClick={changeToLight}>
-          <p className="sidebar__link-title">Light Theme</p>
-        </button>
-        <button className="sidebar__link" type="button" onClick={changeToDark}>
-          <p className="sidebar__link-title">Dark Theme</p>
-        </button>
-      </SidebarCategory> */}
+      /> */}
+      <SidebarCategory
+        title="Inventory Reports"
+        icon="layers"
+        sidebarCollapse={sidebarCollapse}
+      >
+        <SidebarLink title="Consolidated Inv Report" route="/fitness_dashboard" onClick={onClick} />
+        <SidebarLink title="Consolidated History Report" route="/history_reports" onClick={onClick} />
+        <SidebarLink title="Inventory Lotcode Report" route="/inventory_lot_reports" onClick={onClick} />
+        <SidebarLink title="Serial No Report" route="/serial_reports" onClick={onClick} />
+        <SidebarLink title="KIT Inventory" route="/kit_inventory" onClick={onClick} />
+      </SidebarCategory>
       {/* <SidebarLink
         title="Log In"
         route="/log_in"
@@ -62,7 +68,7 @@ const SidebarContent = ({
       /> */}
     </ul>
     {/* <ul className="sidebar__block"> */}
-      {/* <SidebarCategory title="UI Elements" icon="diamond" sidebarCollapse={sidebarCollapse}>
+    {/* <SidebarCategory title="UI Elements" icon="diamond" sidebarCollapse={sidebarCollapse}>
         <SidebarLink title="Alerts" route="/ui/alerts" onClick={onClick} />
         <SidebarLink title="Buttons" route="/ui/buttons" onClick={onClick} />
         <SidebarLink title="Carousel" route="/ui/carousel" onClick={onClick} />
@@ -79,10 +85,10 @@ const SidebarContent = ({
         <SidebarLink title="Tooltips & Popovers" route="/ui/tooltips" onClick={onClick} />
         <SidebarLink title="Typography" route="/ui/typography" onClick={onClick} />
       </SidebarCategory> */}
-      {/* <SidebarLink title="Mail Application" icon="envelope" route="/mail" onClick={onClick} />
+    {/* <SidebarLink title="Mail Application" icon="envelope" route="/mail" onClick={onClick} />
       <SidebarLink title="Chat Application" icon="bubble" route="/chat" onClick={onClick} />
       <SidebarLink title="Todo Application" newLink icon="book" route="/todo" onClick={onClick} /> */}
-      {/* <SidebarCategory title="Forms" icon="file-add" sidebarCollapse={sidebarCollapse}>
+    {/* <SidebarCategory title="Forms" icon="file-add" sidebarCollapse={sidebarCollapse}>
         <SidebarCategory title="React final form" sidebarCollapse={sidebarCollapse}>
           <SidebarLink title="Basic Form" route="/forms/react_final_form/basic_form" onClick={onClick} />
           <SidebarLink

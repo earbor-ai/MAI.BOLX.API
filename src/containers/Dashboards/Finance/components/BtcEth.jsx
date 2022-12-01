@@ -314,14 +314,14 @@ const BtcEth = ({ theme, dir, name, data }) => {
     const finalLastTenArray = [];
     data?.forEach((e1) =>
       resultDates?.forEach((e2) => {
-        if (e1?.orderDate?.toString()?.substring(0, 10) === e2) {
+        if (e1?.orderdate?.toString()?.substring(0, 10) === e2) {
           finalArray.push(e1);
         }
       })
     );
     data?.forEach((e1) =>
       resultMonths?.forEach((e2) => {
-        if (e1?.orderDate?.toString()?.substring(5, 7) === e2) {
+        if (e1?.orderdate?.toString()?.substring(5, 7) === e2) {
           finalMothlyArray.push(e1);
         }
       })
@@ -329,7 +329,7 @@ const BtcEth = ({ theme, dir, name, data }) => {
 
     data?.forEach((e1) =>
       tenYears?.forEach((e2) => {
-        const orderYear = e1?.orderDate?.toString()?.substring(0, 4);
+        const orderYear = e1?.orderdate?.toString()?.substring(0, 4);
         if (orderYear === e2) {
           finalLastTenArray.push(e1);
         }
@@ -347,8 +347,8 @@ const BtcEth = ({ theme, dir, name, data }) => {
       } else {
         const lastPushedArray = acc[acc.length - 1];
         if (
-          lastPushedArray[0]?.orderDate?.toString()?.substring(0, 10) ===
-          curr?.orderDate?.toString()?.substring(0, 10)
+          lastPushedArray[0]?.orderdate?.toString()?.substring(0, 10) ===
+          curr?.orderdate?.toString()?.substring(0, 10)
         ) {
           acc[acc.length - 1][1]++;
         } else {
@@ -364,8 +364,8 @@ const BtcEth = ({ theme, dir, name, data }) => {
       } else {
         const lastPushedArray = acc[acc.length - 1];
         if (
-          lastPushedArray[0]?.orderDate?.toString()?.substring(0, 7) ===
-          curr?.orderDate?.toString()?.substring(0, 7)
+          lastPushedArray[0]?.orderdate?.toString()?.substring(0, 7) ===
+          curr?.orderdate?.toString()?.substring(0, 7)
         ) {
           acc[acc.length - 1][1]++;
         } else {
@@ -383,7 +383,7 @@ const BtcEth = ({ theme, dir, name, data }) => {
         const lastPushedArrayOrderDate = lastPushedArray[0]?.orderDate
           ?.toString()
           ?.substring(0, 4);
-        const currOrderDate = curr?.orderDate?.toString()?.substring(0, 4);
+        const currOrderDate = curr?.orderdate?.toString()?.substring(0, 4);
         if (lastPushedArrayOrderDate === currOrderDate) {
           acc[acc.length - 1][1]++;
         } else {
@@ -396,11 +396,11 @@ const BtcEth = ({ theme, dir, name, data }) => {
     const chartWeekly = [];
 
     modifiedArray?.forEach((e, i) => {
-      const d = new Date(e[0]?.orderDate?.toString()?.substring(0, 10));
+      const d = new Date(e[0]?.orderdate?.toString()?.substring(0, 10));
       const quantity = [{ noOfOrders: e[1] }];
       chartWeekly?.push({
         id: i,
-        date: e[0]?.orderDate?.toString()?.substring(0, 10),
+        date: e[0]?.orderdate?.toString()?.substring(0, 10),
         noOfOrders: e[1],
         day: d.toLocaleDateString("en-US", { weekday: "long" }),
       });
@@ -409,7 +409,7 @@ const BtcEth = ({ theme, dir, name, data }) => {
 
     weeklyArray.forEach((e, i) =>
       modifiedArray?.forEach((e2, i2) => {
-        const day = new Date(e2[0]?.orderDate?.toString()?.substring(0, 10));
+        const day = new Date(e2[0]?.orderdate?.toString()?.substring(0, 10));
         if (e?.id === day.getDay()) {
           weeklyArray[i].orders = e2[1];
           weeklyArray[6].orders = 0;
@@ -478,7 +478,7 @@ const BtcEth = ({ theme, dir, name, data }) => {
     //*
     modifiedArray?.forEach((e1, i1) =>
       monthlyArray?.forEach((e2, i2) => {
-        const date = e1[0]?.orderDate?.toString()?.substring(0, 10);
+        const date = e1[0]?.orderdate?.toString()?.substring(0, 10);
         const week = getISOWeekInMonth(date).week;
         if (week === e2.id) {
           monthlyArray[i2].orders += e1[1];
@@ -489,7 +489,7 @@ const BtcEth = ({ theme, dir, name, data }) => {
 
     modifiedMonthlyArray?.forEach((e1, i1) =>
       yearlyArray?.forEach((e2, i2) => {
-        const month = e1[0]?.orderDate?.toString()?.substring(5, 7);
+        const month = e1[0]?.orderdate?.toString()?.substring(5, 7);
         if (month === e2.id) {
           yearlyArray[i2].noOfOrders += e1[1];
         }
@@ -498,7 +498,7 @@ const BtcEth = ({ theme, dir, name, data }) => {
 
     modifiedYearlyArray?.forEach((e1, i1) =>
       lastTenYears?.forEach((e2, i2) => {
-        const year = e1[0]?.orderDate?.toString()?.substring(0, 4);
+        const year = e1[0]?.orderdate?.toString()?.substring(0, 4);
         if (year === e2.year) {
           lastTenYears[i2].noOfOrders += e1[1];
         }
