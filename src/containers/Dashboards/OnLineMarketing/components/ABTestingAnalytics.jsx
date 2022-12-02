@@ -511,9 +511,6 @@ const ABTestingAnalytics = ({ dir, themeName }) => {
   const handleDates = (selectedKeys, confirm, dataIndex) => {
     confirm();
   };
-  const HandleDateSetting = (clearFilters) => {
-    clearFilters();
-  };
   const getColumnsDate = (dataIndex) => ({
     filterDropdown: ({
       setSelectedKeys,

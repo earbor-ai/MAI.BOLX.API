@@ -10,7 +10,7 @@ import EditTable from "./EditTable";
 import BASE_URL from "../../../../utils/api/baseUrl";
 
 const { Option } = Select;
-
+const id = localStorage.getItem("clientId");
 const EditOrderItems = ({
   onSubmit,
   orderItemsData,
@@ -60,7 +60,7 @@ const EditOrderItems = ({
       },
     ],
     orderItems: [],
-    clientId: 1029,
+    clientId: `${id}`,
     whid: 9001,
     gnOrderId: null,
     orderDate: "2022-07-13T13:47:08.628656",

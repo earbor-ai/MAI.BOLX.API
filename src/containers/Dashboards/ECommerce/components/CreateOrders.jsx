@@ -37,11 +37,11 @@ const CreateOrders = () => {
   const time = moment(orderDate).format(formatter);
 
   console.log(time);
-
+  const id = localStorage.getItem("clientId");
   const [values, setValues] = useState({
     orderShipments: [],
     orderItems: [],
-    clientId: 1029,
+    clientId: `${id}`,
     whid: 9001,
     gnOrderId: null,
     orderDate: orderDate,

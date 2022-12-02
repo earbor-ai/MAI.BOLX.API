@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
@@ -21,6 +21,9 @@ import {
   Menu,
   Checkbox,
   DatePicker,
+  Input,
+  Select,
+  InputNumber,
 } from "antd";
 import "antd/dist/antd.css";
 import PdfIcon from "mdi-react/PdfIcon";
@@ -33,10 +36,13 @@ import {
   PlusOutlined,
   SearchOutlined,
   CloudUploadOutlined,
+  CalendarOutlined,
 } from "@ant-design/icons";
 import ViewModal from "./components/ViewModal";
 import useGetReq from "../../../customHooks/useGetReq";
 import UploadExcel from "./components/UploadExcel";
+import { Excel, Pdf } from "antd-table-saveas-excel";
+import { first, get } from "lodash";
 
 const { RangePicker } = DatePicker;
 
@@ -53,18 +59,29 @@ const ECommerceDashboard = () => {
     "4",
     "5",
     "6",
-    "9",
+    "7",
+    // "8",
+    // "9",
+    "10",
   ]);
   const [filterColumns, setFilteredColumns] = useState([]);
   const [items, setItems] = useState();
   const [excelVal, setExcelVal] = useState([]);
-  const searchInput = useRef(null);
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
   const [openUpload, setOpenUpload] = useState(false);
   const [excelToArray, setExcelToArray] = useState();
+  const [searchText, setSearchText] = useState("");
+  const [searchedColumn, setSearchedColumn] = useState("");
+  const [newOrder, setNewOrder] = useState();
+  const searchInput = useRef(null);
+  const numericalComparing = useRef(null);
+  const myInputNumber = useRef("");
+  const [shippingColumn, setShippingColumn] = useState([]);
+  const [excelFilters, setExcelFilters] = useState([]);
 
   const token = localStorage.getItem("myToken");
+  const id = localStorage.getItem("clientId");
   useEffect(() => {
     axios
       .get(`http://216.230.74.17:8013/api/Order?clientId=1029`, {
@@ -72,12 +89,21 @@ const ECommerceDashboard = () => {
         Accept: "*/*",
       })
       .then((res) => {
-        console.log(res?.data?.data);
+        // console.log(res?.data?.data);
         setOrderDataSource(res?.data?.data);
+        setNewOrder(res?.data?.data);
       })
       .catch((error) => error.message);
   }, [token]);
-
+  //array pushing new shipping data
+  useEffect(() => {
+    const array = [];
+    orderDataSource?.forEach((item1) => {
+      const data = Object.assign(item1, item1?.ordersshipments[0]);
+      array.push(data);
+    });
+    setShippingColumn(array);
+  }, [orderDataSource]);
   const info = (e, id) => {
     Modal.info({
       content: <ViewModal id={id} />,
@@ -93,17 +119,345 @@ const ECommerceDashboard = () => {
     setCancel(true);
   };
 
-
+  ///filter search
+  ///column search --->string
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+  };
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText("");
+  };
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+      close,
+    }) => (
+      <div
+        style={{
+          padding: 8,
+        }}
+      >
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{
+            marginBottom: 8,
+            display: "block",
+          }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters)}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Reset
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              confirm({
+                closeDropdown: false,
+              });
+              setSearchText(selectedKeys[0]);
+              setSearchedColumn(dataIndex);
+            }}
+          >
+            Filter
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              confirm({
+                closeDropdown: true,
+              });
+            }}
+          >
+            close
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined
+        style={{
+          color: filtered ? "#1890ff" : undefined,
+        }}
+      />
+    ),
+    onFilter: (value, record) => {
+      return record[dataIndex]
+        ?.toString()
+        .toLowerCase()
+        .includes(value.toLowerCase());
+    },
+    onFilterDropdownOpenChange: (visible) => {
+      console.log(visible);
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
+    },
+  });
+  //number filter search
+  const handleResetting = (clearFilters) => {
+    clearFilters();
+    numericalComparing.current.value = 0;
+  };
+  const handleSearchNumber = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+  };
+  const getColumnsNumber = (dataIndex) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+      close,
+    }) => {
+      const selectAfter = (
+        <Select
+          style={{
+            width: 78,
+          }}
+          defaultValue=""
+          // ref={myInputNumber}
+          onSelect={(e) => {
+            console.log(`selected values is ${e}`);
+            myInputNumber.current = e;
+            console.log(numericalComparing?.current.value);
+            setSelectedKeys(
+              myInputNumber?.current === "LessThan" &&
+                numericalComparing.current.value !== null
+                ? orderDataSource.filter(
+                    (field) =>
+                      field?.orderid <= numericalComparing?.current.value
+                  )
+                : myInputNumber?.current === "GreaterThan" &&
+                  numericalComparing.current.value !== null
+                ? orderDataSource.filter(
+                    (field) =>
+                      field?.orderid >= numericalComparing?.current.value
+                  )
+                : myInputNumber?.current === "EqualTo" &&
+                  numericalComparing.current.value !== null
+                ? orderDataSource.filter(
+                    (field) =>
+                      field?.orderid == numericalComparing?.current.value
+                  )
+                : null
+            );
+          }}
+          onChange={(e) => {
+            console.log(`changeSelect ${e}`);
+            console.log(selectedKeys);
+          }}
+        >
+          <option value="">select</option>
+          <option value="LessThan">≤</option>
+          <option value="GreaterThan">≥</option>
+          <option value="EqualTo">=</option>
+        </Select>
+      );
+      return (
+        <>
+          <div
+            style={{
+              padding: 8,
+            }}
+          >
+            <Space direction="vertical">
+              <InputNumber
+                defaultValue={0}
+                ref={numericalComparing}
+                addonAfter={selectAfter}
+                value={numericalComparing?.current?.value}
+                onPressEnter={() =>
+                  handleSearchNumber(selectedKeys, confirm, dataIndex)
+                }
+                onChange={(e) => {
+                  numericalComparing.current = e;
+                  console.log(numericalComparing);
+                  // setZeroData(0)
+                  setSelectedKeys(
+                    myInputNumber?.current === "LessThan"
+                      ? orderDataSource.filter(
+                          (field) =>
+                            field?.orderid <= numericalComparing?.current
+                        )
+                      : myInputNumber?.current === "GreaterThan"
+                      ? orderDataSource.filter(
+                          (field) =>
+                            field?.orderid >= numericalComparing?.current
+                        )
+                      : myInputNumber?.current === "EqualTo"
+                      ? orderDataSource.filter(
+                          (field) =>
+                            field?.orderid === numericalComparing?.current
+                        )
+                      : numericalComparing === null
+                      ? null
+                      : null
+                  );
+                  console.log(selectedKeys);
+                }}
+              />
+              <Space>
+                <Button
+                  type="link"
+                  size="small"
+                  onClick={(e) => {
+                    handleSearchNumber(selectedKeys, confirm, dataIndex);
+                  }}
+                >
+                  Filter
+                </Button>
+                <Button
+                  onClick={() => {
+                    clearFilters && handleResetting(clearFilters);
+                  }}
+                  size="small"
+                  style={{
+                    width: 90,
+                  }}
+                >
+                  Reset
+                </Button>
+                <Button
+                  type="link"
+                  size="small"
+                  style={{
+                    width: 110,
+                  }}
+                  onClick={() => {
+                    confirm({
+                      closeDropdown: true,
+                    });
+                  }}
+                >
+                  close
+                </Button>
+              </Space>
+            </Space>
+          </div>
+        </>
+      );
+    },
+    filterIcon: (filtered) => (
+      <SearchOutlined
+        style={{
+          color: filtered ? "#1890ff" : undefined,
+        }}
+      />
+    ),
+    onFilter: (value, record) => {
+      return record?.orderid === value?.orderid;
+    },
+    onFilterDropdownVisibleChange: (visible) => {
+      console.log(visible);
+      if (visible) {
+        setTimeout(() => numericalComparing.current?.select(), 100);
+      }
+    },
+  });
+  ///column dates
+  const handleDates = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+  };
+  const getColumnsDate = (dataIndex) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+      close,
+    }) => {
+      const changingDate = (date, dateString) => {
+        setSelectedKeys(
+          dateString !== ""
+            ? orderDataSource.filter(
+                (field) =>
+                  field?.orderdate.substr(0, 10) >= dateString[0] &&
+                  field?.orderdate.substr(0, 10) <= dateString[1]
+              )
+            : null
+        );
+      };
+      return (
+        <>
+          <div
+            style={{
+              padding: 8,
+            }}
+          >
+            <Space direction="horizontal">
+              <RangePicker onChange={changingDate} />
+            </Space>
+            <Space>
+              <Button
+                type="link"
+                size="small"
+                onClick={(e) => {
+                  handleDates(selectedKeys, confirm, dataIndex);
+                }}
+              >
+                Filter
+              </Button>
+            </Space>
+          </div>
+        </>
+      );
+    },
+    filterIcon: (filtered) => (
+      <CalendarOutlined
+        style={{
+          color: filtered ? "#1890ff" : undefined,
+        }}
+      />
+    ),
+    onFilter: (value, record) => {
+      return record?.orderdate.substr(0, 10) === value?.orderdate.substr(0, 10);
+    },
+    onFilterDropdownVisibleChange: (visible) => {
+      console.log(visible);
+    },
+  });
+  ///destructure order shipments
   const columns = [
     {
       key: "1",
       title: "Order#",
       responsive: ["xs", "sm", "md", "lg"],
       dataKey: "orderid",
+      sorter: (a, b) => a.orderid - b.orderid,
       align: "left",
-      render: (_, record) => (
-        <Typography.Text>{record?.orderid}</Typography.Text>
-      ),
+      render: (_, record) =>
+        // <Typography.Text>{record?.orderid}</Typography.Text>
+        record?.orderid,
+      ...getColumnsNumber("orderid"),
     },
     {
       key: "2",
@@ -111,10 +465,10 @@ const ECommerceDashboard = () => {
       responsive: ["xs", "sm", "md", "lg"],
       dataKey: "custorderid",
       align: "left",
-      render: (_, record) => (
-        <Typography.Text>{record?.custorderid}</Typography.Text>
-      ),
+      sorter: (a, b) => a.custorderid.length - b.custorderid.length,
+      render: (_, record) => record?.custorderid,
       showOnResponse: true,
+      ...getColumnSearchProps("custorderid"),
     },
     {
       key: "3",
@@ -122,92 +476,128 @@ const ECommerceDashboard = () => {
       dataKey: "orderstatus",
       responsive: ["xs", "sm", "md", "lg"],
       align: "left",
+      sorter: (a, b) => a.orderstatus.length - b.orderstatus.length,
       render: (_, record) => (
-        <>
-          {orderIds.includes(record?.orderid) ? (
-            <Tag color="yellow">Cancelled</Tag>
-          ) : (
-            <Tag
-              color={
-                record.orderstatus === "NEW"
-                  ? "blue"
-                  : record.orderstatus === "Open"
-                  ? "green"
-                  : record.orderstatus === "Cancel"
-                  ? "yellow"
-                  : null
-              }
-            >
-              <Typography.Text>{record?.orderstatus}</Typography.Text>
-            </Tag>
-          )}
-        </>
+        <Tag
+          color={
+            record.orderstatus === "NEW"
+              ? "blue"
+              : record.orderstatus === "Open"
+              ? "green"
+              : record.orderstatus === "Cancel"
+              ? "yellow"
+              : null
+          }
+        >
+          {record?.orderstatus}
+        </Tag>
       ),
-      sorter: (a, b) => a.orderstatus - b.orderstatus,
-      // ...getColumnSearchProps("orderStatus"),
+      // render: (_, record) => (
+      //   <div>
+      //     {orderIds.includes(record?.orderid) ? (
+      //       <Tag color="yellow">Cancelled</Tag>
+      //     ) : (
+      //       <Tag
+      //         color={
+      //           record.orderstatus === "NEW"
+      //             ? "blue"
+      //             : record.orderstatus === "Open"
+      //             ? "green"
+      //             : record.orderstatus === "Cancel"
+      //             ? "yellow"
+      //             : null
+      //         }
+      //       >
+      //         {record?.orderstatus}
+      //       </Tag>
+      //     )}
+      //   </div>
+      // ),
+      filters: [
+        {
+          text: "NEW",
+          value: "NEW",
+        },
+        {
+          text: "OPEN",
+          value: "Open",
+        },
+        {
+          text: "Cancel",
+          value: "Cancel",
+        },
+      ],
+      onFilter: (value, record) => record.orderstatus.includes(value),
     },
     {
       key: "4",
       title: "Customer Name",
-      dataKey: "shipCustomerName",
+      dataKey: "shipcustomername",
       responsive: ["xs", "sm", "md", "lg"],
       align: "left",
-      render: (_, record) => (
-        <Typography.Text>
-          {record?.ordersshipments[0]?.shipcustomername}
-        </Typography.Text>
-      ),
+      sorter: (a, b) => a.shipcustomername?.length - b.shipcustomername?.length,
+      render: (_, record) => record?.shipcustomername,
       hidden: false,
+      ...getColumnSearchProps("shipcustomername"),
     },
     {
       key: "5",
-      title: "City/State",
-      dataKey: "shipstate",
+      title: "City",
+      dataKey: "shipcity",
       responsive: ["xs", "sm", "md", "lg"],
       align: "left",
-      render: (_, record) => (
-        <Typography.Text>
-          {record?.ordersshipments[0]?.shipcity}/
-          {record?.ordersshipments[0]?.shipstate}
-        </Typography.Text>
-      ),
+      dataIndex: "shipcity",
+      sorter: (a, b) => a.shipcity - b.shipstate,
+      render: (_, record) => record?.shipcity,
+      ...getColumnSearchProps("shipcity"),
     },
     {
       key: "6",
+      title: "State",
+      dataKey: "shipstate",
+      responsive: ["xs", "sm", "md", "lg"],
+      align: "left",
+      dataIndex: "shipstate",
+      sorter: (a, b) => a.shipstate - b.shipstate,
+      render: (_, record) => record?.shipstate,
+      ...getColumnSearchProps("shipstate"),
+    },
+    {
+      key: "7",
       title: "Order Creation Date",
       dataKey: "orderdate",
       responsive: ["xs", "sm", "md", "lg"],
       align: "left",
-      render: (_, record) => (
-        <Typography.Text>{record?.orderdate}</Typography.Text>
-      ),
-      // sorter: (a, b) => a.sku1?.length - b.sku1?.length,
+      sorter: (a, b) => a.orderdate - b.orderdate,
+      render: (_, record) => record?.orderdate.substr(0, 10),
+      ...getColumnsDate("orderdate"),
     },
     {
-      key: "7",
+      key: "8",
       title: "Ship Cost",
       dataKey: "ordershipcost",
       responsive: ["xs", "sm", "md", "lg"],
       align: "left",
-      render: (_, record) => (
-        <Typography.Text>{record?.ordershipcost}</Typography.Text>
-      ),
+      sorter: (a, b) => a.ordershipcost - b.ordershipcost,
+      render: (_, record) => record?.ordershipcost,
     },
     {
-      key: "8",
+      key: "9",
       dataKey: "whid",
       title: "Warehouse#",
       responsive: ["xs", "sm", "md", "lg"],
       align: "left",
-      render: (_, record) => <Typography.Text>{record?.whid}</Typography.Text>,
+      sorter: (a, b) => a.whid - b.whid,
+      render: (_, record) => record?.whid,
     },
     {
-      key: "9",
+      key: "10",
       title: "Action",
+      // dataKey: "action",
       width: 100,
       hidden: false,
       render: (_, record) => (
-        <>
+        <div>
           {record?.orderstatus === "Cancel" ? (
             <Space size="small">
               <Tooltip title="View">
@@ -253,7 +643,7 @@ const ECommerceDashboard = () => {
               </>
             </Space>
           )}
-        </>
+        </div>
       ),
     },
   ];
@@ -345,34 +735,27 @@ const ECommerceDashboard = () => {
       console.log("Please upload a valid Excel file.");
     }
   }
-
-  useEffect(() => {
-    let groupedSubItems = [];
-    orderDataSource?.forEach((item) => {
-      if (item.orderShipments) {
-        groupedSubItems = groupedSubItems.concat(
-          Object.assign(item, item.orderShipments[0])
-        );
-      }
-    });
-    setItems(groupedSubItems);
-  }, [orderDataSource]);
-
   const handlePrint = () => {
-    const Doc = new jsPDF();
-    Doc.text("Orders Details", 15, 10);
-    Doc.autoTable({
-      columns: filterColumns.map((col) => ({ ...col, dataKey: col.dataKey })),
-      body: items,
-      theme: "grid",
-    });
-    Doc.save("Orders.pdf");
+    const doc = new jsPDF("l", "pt", "a4");
+    doc.text("SKU Details", 38, 50);
+    const MyGreatValues = filterColumns?.filter((value) => value.key != 10);
+    doc.autoTable(
+      // filterColumns.map((col) => ({ ...col, dataKey: col.dataKey })),
+      filterColumns.filter((value) => {
+        return value?.key == 10;
+      })
+        ? MyGreatValues.map((col) => ({ ...col, dataKey: col.dataKey }))
+        : null,
+      shippingColumn,
+      {
+        startY: 60,
+      }
+    );
+    doc.save();
   };
-
   const onChange = (checkedValues) => {
     setDefaultValues(checkedValues);
   };
-
   const menu = (
     <Menu>
       <Menu.Item>
@@ -405,26 +788,31 @@ const ECommerceDashboard = () => {
           </Col>
           <Col span={8}>
             <Checkbox value="5" style={{ marginBottom: "7px" }}>
-              City/State
+              City
             </Checkbox>
           </Col>
           <Col span={8}>
             <Checkbox value="6" style={{ marginBottom: "7px" }}>
-              Order Creation Date
+              State
             </Checkbox>
           </Col>
           <Col span={8}>
             <Checkbox value="7" style={{ marginBottom: "7px" }}>
-              Ship Cost
+              Order Creation Date
             </Checkbox>
           </Col>
           <Col span={8}>
             <Checkbox value="8" style={{ marginBottom: "7px" }}>
+              Ship Cost
+            </Checkbox>
+          </Col>
+          <Col span={8}>
+            <Checkbox value="9" style={{ marginBottom: "7px" }}>
               Warehouse#
             </Checkbox>
           </Col>
           <Col span={8}>
-            <Checkbox value="9" disabled style={{ marginBottom: "7px" }}>
+            <Checkbox value="10" disabled style={{ marginBottom: "7px" }}>
               Action
             </Checkbox>
           </Col>
@@ -444,7 +832,6 @@ const ECommerceDashboard = () => {
     setFilteredColumns(clmns);
   }, [orderDataSource, defaultValue]);
 
-
   const getDateRange = (date, dateString) => {
     console.log(date, dateString);
     date.map((sd) => setStartDate(sd?._d));
@@ -457,18 +844,26 @@ const ECommerceDashboard = () => {
     });
     console.log(resultProductData);
   };
-
+  console.log(filterColumns?.filter((value) => value.key != 10));
   const handleClick = () => {
-    const workSheet = XLSX.utils.json_to_sheet(items);
-    const workBook = { Sheets: { data: workSheet }, SheetNames: ["data"] };
-
-    XLSX.utils.book_append_sheet(workBook, workSheet, "students");
-    const buf = XLSX.write(workBook, { bookType: "xlsx", type: "array" });
-    XLSX.write(workBook, { bookType: "xlsx", type: "binary" });
-    XLSX.writeFile(workBook, "Data.xlsx");
-    setExcelVal(filterColumns);
+    alert("excel");
+    const MyGreatValues = filterColumns?.filter((value) => value.key != 10);
+    console.log(MyGreatValues);
+    const excel = new Excel();
+    excel
+      .addSheet("test")
+      .addColumns(
+        filterColumns.filter((value) => {
+          return value?.key == 10;
+        })
+          ? MyGreatValues
+          : null
+      )
+      .addDataSource(shippingColumn, {
+        str2Percent: true,
+      })
+      .saveAs("Excel.xlsx");
   };
-
   const locale = {
     emptyText: (
       <Space size="large">
@@ -540,47 +935,38 @@ const ECommerceDashboard = () => {
                 <Table
                   columns={filterColumns}
                   dataSource={
-                    filteredTable?.length > 0 ? filteredTable : orderDataSource
+                    // filteredTable?.length > 0 ? filteredTable : orderDataSource
+                    filteredTable?.length > 0 ? filteredTable : shippingColumn
                   }
                   size="small"
                   title={() => (
                     <>
-                      <div className="header__section">
-                        <div>
-                          {orderDataSource?.length > 0 ? (
-                            <Space>
-                              <Tooltip placement="bottom" title="Export to PDF">
-                                <PdfIcon
-                                  style={{ color: "red", cursor: "pointer" }}
-                                  onClick={handlePrint}
-                                />
-                              </Tooltip>
-                              <Tooltip
-                                placement="bottom"
-                                title="Export to Excel"
-                              >
-                                <FileExcelIcon
-                                  style={{ color: "green", cursor: "pointer" }}
-                                  onClick={handleClick}
-                                />
-                              </Tooltip>
-                              <AutoComplete
-                                style={{
-                                  width: "10em",
-                                  marginRight: "10px",
-                                }}
-                                enterButton="search"
-                                onSearch={search}
-                                placeholder="Search by ...."
-                              />
-                            </Space>
-                          ) : null}
-                        </div>
-                        <div className="search__input">
+                      {orderDataSource?.length > 0 ? (
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
                           <div>
-                            <RangePicker
-                              style={{ marginRight: "10px" }}
-                              onChange={getDateRange}
+                            <PdfIcon
+                              style={{ color: "red", cursor: "pointer" }}
+                              onClick={handlePrint}
+                            />
+                            <FileExcelIcon
+                              style={{ color: "green", cursor: "pointer" }}
+                              onClick={handleClick}
+                            />
+                          </div>
+                          <div>
+                            <AutoComplete
+                              style={{
+                                width: "10em",
+                                marginRight: "10px",
+                              }}
+                              enterButton="search"
+                              onSearch={search}
+                              placeholder="Search by ...."
                             />
                             <Dropdown overlay={menu} arrow>
                               <Button>
@@ -592,7 +978,7 @@ const ECommerceDashboard = () => {
                             </Dropdown>
                           </div>
                         </div>
-                      </div>
+                      ) : null}
                     </>
                   )}
                   bordered
@@ -614,4 +1000,5 @@ const ECommerceDashboard = () => {
     </Container>
   );
 };
-export default connect()(ECommerceDashboard);
+// export default connect()(ECommerceDashboard);
+export default React.memo(ECommerceDashboard);
