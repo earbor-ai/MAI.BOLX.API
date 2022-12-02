@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Col, Card, CardBody, Row, Label } from "reactstrap";
+import { Col, Card, CardBody, Row, Label, Container } from "reactstrap";
 import { Select, DatePicker, Button, Table, Typography, message } from "antd";
 import { SearchOutlined, CloseOutlined } from "@ant-design/icons";
 
@@ -131,7 +131,7 @@ const HistoryReport = () => {
     {
       key: "4",
       title: "Date",
-      responsive: ["xs", "sm", "md", "lg"],
+      responsive: ["xs", "sm", "md", "lg", "xl"],
       dataKey: "date",
       align: "left",
       render: (_, record) => <Typography.Text>{record?.date}</Typography.Text>,
@@ -184,123 +184,132 @@ const HistoryReport = () => {
   ];
 
   return (
-    <Col md={12} lg={12}>
-      {contextHolder}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginTop: "-20px",
-        }}
-      >
-        <h4>History Reports</h4>
-        <p>History Reports / Inventory Reports</p>
-      </div>
-      <Card className="wizard__Card">
-        <CardBody className="wizard">
-          <Row>
-            <Col className="mb-3 col-lg-3">
-              <Label>Select SKU:</Label>
-              <Select
-                showSearch
-                placeholder="Select a SKU"
-                optionFilterProp="children"
-                onChange={onChange}
-                onSearch={onSearch}
-                loading={skuLoading}
-                allowClear
-                filterOption={(input, option) =>
-                  (option?.label ?? "")
-                    .toLowerCase()
-                    .includes(input.toLowerCase())
-                }
-                style={{ width: "100%" }}
-              >
-                {/* <option value="">Select SKU&apos;s</option> */}
-                {mySKus?.map((ourskus) => {
-                  return (
-                    <option value={ourskus?.skuid}>{ourskus?.sku1}</option>
-                  );
-                })}
-              </Select>
-            </Col>
-            <Col className="mb-3 col-lg-3">
-              <Label>
-                Start Date: <span style={{ color: "red" }}>*</span>
-              </Label>
-              <DatePicker
-                onChange={startDateChange}
-                style={{ width: "100%" }}
-                format="MM/DD/YYYY"
-              />
-            </Col>
-            <Col className="mb-3 col-lg-3">
-              <Label>
-                End Date: <span style={{ color: "red" }}>*</span>
-              </Label>
-              <DatePicker
-                onChange={endDateChange}
-                style={{ width: "100%" }}
-                format="MM/DD/YYYY"
-              />
-            </Col>
-            <Col className="mt-4 col-lg-3">
-              {!startDate || !endDate ? (
-                <Button
-                  type="primary"
-                  icon={<SearchOutlined />}
-                  style={{ marginRight: "10px" }}
-                  onClick={warning}
-                >
-                  Search
-                </Button>
-              ) : (
-                <Button
-                  type="primary"
-                  icon={<SearchOutlined />}
-                  style={{ marginRight: "10px" }}
-                  onClick={reportSearch}
-                  loading={buttonLoading}
-                >
-                  {buttonLoading ? <>Please Wait</> : <>Search</>}
-                </Button>
-              )}
+    <Container className="dashboard">
+      <Row>
+        <Col md={12} lg={12}>
+          {contextHolder}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginTop: "-20px",
+            }}
+          >
+            <h4>History Reports</h4>
+            <p>History Reports / Inventory Reports</p>
+          </div>
+          <Card style={{ minHeight: "300px" }}>
+            <CardBody>
+              <Row>
+                <Col className="mb-3 col-lg-3 col-xs-12">
+                  <Label>Select SKU:</Label>
+                  <Select
+                    showSearch
+                    placeholder="Select a SKU"
+                    optionFilterProp="children"
+                    onChange={onChange}
+                    scroll={{ x: true }}
+                    onSearch={onSearch}
+                    loading={skuLoading}
+                    allowClear
+                    filterOption={(input, option) =>
+                      (option?.label ?? "")
+                        .toLowerCase()
+                        .includes(input.toLowerCase())
+                    }
+                    style={{ width: "100%" }}
+                  >
+                    {/* <option value="">Select SKU&apos;s</option> */}
+                    {mySKus?.map((ourskus) => {
+                      return (
+                        <option value={ourskus?.uniqueid}>{ourskus?.clientname}</option>
+                      );
+                    })}
+                  </Select>
+                </Col>
+                <Col className="mb-3 col-lg-3 col-xs-12">
+                  <Label>
+                    Start Date: <span style={{ color: "red" }}>*</span>
+                  </Label>
+                  <DatePicker
+                    onChange={startDateChange}
+                    style={{ width: "100%" }}
+                    format="MM/DD/YYYY"
+                  />
+                </Col>
+                <Col className="mb-3 col-lg-3 col-xs-12">
+                  <Label>
+                    End Date: <span style={{ color: "red" }}>*</span>
+                  </Label>
+                  <DatePicker
+                    onChange={endDateChange}
+                    style={{ width: "100%" }}
+                    format="MM/DD/YYYY"
+                  />
+                </Col>
+                <Col className="mt-4 col-lg-3 col-xs-12">
+                  {!startDate || !endDate ? (
+                    <Button
+                      type="primary"
+                      icon={<SearchOutlined />}
+                      style={{ marginRight: "10px" }}
+                      onClick={warning}
+                    >
+                      Search
+                    </Button>
+                  ) : (
+                    <Button
+                      type="primary"
+                      icon={<SearchOutlined />}
+                      style={{ marginRight: "10px" }}
+                      onClick={reportSearch}
+                      loading={buttonLoading}
+                    >
+                      {buttonLoading ? <>Please Wait</> : <>Search</>}
+                    </Button>
+                  )}
 
-              <Button
-                type="primary"
-                icon={<CloseOutlined />}
-                style={{ background: "#ffcd05", borderColor: "#ebe00b" }}
-                onClick={onCancel}
-              >
-                Cancel
-              </Button>
-            </Col>
-          </Row>
+                  <Button
+                    type="primary"
+                    icon={<CloseOutlined />}
+                    style={{ background: "#ffcd05", borderColor: "#ebe00b" }}
+                    onClick={onCancel}
+                  >
+                    Cancel
+                  </Button>
+                </Col>
+              </Row>
 
-          {tableData?.length > 0 ? (
-            <Table
-              columns={columns}
-              dataSource={tableData ? tableData : null}
-              rowClassName={(record, index) =>
-                record?.description?.length > 0
-                  ? "table-row-dark"
-                  : "table-row-light"
-              }
-              bordered
-              size="small"
-              pagination={{
-                defaultPageSize: 10,
-                showSizeChanger: true,
-                pageSizeOptions: ["10", "20", "30", "50", "100"],
-              }}
-              style={{ marginTop: "15px" }}
-              stripes="even"
-            />
-          ) : null}
-        </CardBody>
-      </Card>
-    </Col>
+              <Row>
+                <Col sm={12} lg={12} md={12} xs={6} xl={12}>
+                  {tableData?.length > 0 ? (
+                    <Table
+                      columns={columns}
+                      dataSource={tableData ? tableData : null}
+                      rowClassName={(record, index) =>
+                        record?.description?.length > 0
+                          ? "table-row-dark"
+                          : "table-row-light"
+                      }
+                      bordered
+                      size="small"
+                      pagination={{
+                        defaultPageSize: 10,
+                        showSizeChanger: true,
+                        pageSizeOptions: ["10", "20", "30", "50", "100"],
+                      }}
+                      style={{ marginTop: "15px", overflowX: "auto" }}
+                      stripes="even"
+                    />
+                  ) : null}
+                </Col>
+              </Row>
+            </CardBody>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 

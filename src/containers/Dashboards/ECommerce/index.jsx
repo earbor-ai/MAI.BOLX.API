@@ -27,6 +27,7 @@ import {
 } from "antd";
 import "antd/dist/antd.css";
 import PdfIcon from "mdi-react/PdfIcon";
+import { Excel, Pdf } from "antd-table-saveas-excel";
 import FileExcelIcon from "mdi-react/MicrosoftExcelIcon";
 import {
   EditOutlined,
@@ -41,8 +42,7 @@ import {
 import ViewModal from "./components/ViewModal";
 import useGetReq from "../../../customHooks/useGetReq";
 import UploadExcel from "./components/UploadExcel";
-import { Excel, Pdf } from "antd-table-saveas-excel";
-import { first, get } from "lodash";
+
 
 const { RangePicker } = DatePicker;
 
@@ -95,7 +95,7 @@ const ECommerceDashboard = () => {
       })
       .catch((error) => error.message);
   }, [token]);
-  //array pushing new shipping data
+  // array pushing new shipping data
   useEffect(() => {
     const array = [];
     orderDataSource?.forEach((item1) => {
@@ -119,8 +119,8 @@ const ECommerceDashboard = () => {
     setCancel(true);
   };
 
-  ///filter search
-  ///column search --->string
+  // / filter search
+  // / column search --->string
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
   };
@@ -222,7 +222,7 @@ const ECommerceDashboard = () => {
       }
     },
   });
-  //number filter search
+  // number filter search
   const handleResetting = (clearFilters) => {
     clearFilters();
     numericalComparing.current.value = 0;
@@ -383,7 +383,7 @@ const ECommerceDashboard = () => {
       }
     },
   });
-  ///column dates
+  // column dates
   const handleDates = (selectedKeys, confirm, dataIndex) => {
     confirm();
   };
@@ -445,7 +445,7 @@ const ECommerceDashboard = () => {
       console.log(visible);
     },
   });
-  ///destructure order shipments
+  // destructure order shipments
   const columns = [
     {
       key: "1",

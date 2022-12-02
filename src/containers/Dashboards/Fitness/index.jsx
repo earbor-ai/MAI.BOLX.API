@@ -232,7 +232,8 @@ function FitnessDashboard() {
                     </Form.Item>
                   </div>
                 </Form>
-                {tableShowing ? (
+              </Col>
+              {tableShowing ? (
                   <>
                     <Table
                       columns={columns}
@@ -252,7 +253,6 @@ function FitnessDashboard() {
                     />
                   </>
                 ) : null}
-              </Col>
             </CardBody>
           </Card>
         </Row>
