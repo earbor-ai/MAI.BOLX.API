@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { Col, Card, CardBody, Row, Label, Container } from "reactstrap";
-import { Select, DatePicker, Button, Table, Typography, message } from "antd";
+import { Select, DatePicker, Button, Table, Typography, message, Input, Space, InputNumber } from "antd";
 import { SearchOutlined, CloseOutlined } from "@ant-design/icons";
 
 const HistoryReport = () => {
@@ -15,6 +15,11 @@ const HistoryReport = () => {
   const [cancel, setCancel] = useState(false);
   const [showError, setShowError] = useState();
   const [messageApi, contextHolder] = message.useMessage();
+  const [searchText, setSearchText] = useState('');
+  const [searchedColumn, setSearchedColumn] = useState('');
+  const searchInput = useRef(null);
+  const numericalComparing = useRef(null);
+  const myInputNumber = useRef("");
   const token = localStorage.getItem("myToken");
   const id = localStorage.getItem("clientId");
   useEffect(() => {
@@ -78,7 +83,7 @@ const HistoryReport = () => {
 
       axios({
         method: "POST",
-        url: "http://216.230.74.17:8013/api/InventoryReport",
+        url: "http://216.230.74.17:8013/api/InventoryReport/GetConsolidatedHistoryReports",
         data: postData,
         headers: {
           accept: "*/*",
@@ -97,6 +102,263 @@ const HistoryReport = () => {
     }
   };
 
+  //filters
+  ///filter for string
+
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText('');
+  };
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+    <div
+           style={{
+             padding: 8,
+           }}
+         >
+    <Input
+             ref={searchInput}
+             placeholder={`Search ${dataIndex}`}
+             value={selectedKeys[0]}
+             onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+             onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+             style={{
+               marginBottom: 8,
+               display: 'block',
+             }}
+           />
+    <Space>
+             <Button
+               type="primary"
+               onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+               icon={<SearchOutlined />}
+               size="small"
+               style={{
+                 width: 90,
+               }}
+             >
+    Search
+             </Button>
+    <Button
+               onClick={() => clearFilters && handleReset(clearFilters)}
+               size="small"
+               style={{
+                 width: 90,
+               }}
+             >
+               Reset
+             </Button>
+    <Button
+               type="link"
+               size="small"
+               onClick={() => {
+                 confirm({
+                   closeDropdown: false,
+                 });
+                 setSearchText(selectedKeys[0]);
+                 setSearchedColumn(dataIndex);
+               }}
+             >
+               Filter
+             </Button>
+    <Button
+               type="link"
+               size="small"
+               onClick={() => {
+                 close();
+               }}
+             >
+               close
+             </Button>
+           </Space>
+         </div>
+       ),
+   filterIcon: (filtered) => (
+         <SearchOutlined
+           style={{
+             color: filtered ? '#1890ff' : undefined,
+           }}
+         />
+       ),
+     onFilter: (value, record) =>
+         record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+     onFilterDropdownOpenChange: (visible) => {
+         if (visible) {
+           setTimeout(() => searchInput.current?.select(), 100);
+         }
+       },
+   });
+   
+
+//filters
+//filter column number 
+const handleResetting = (clearFilters) => {
+  clearFilters();
+  numericalComparing.current.value = 0;
+};
+const handleSearchNumber = (selectedKeys, confirm, dataIndex) => {
+  confirm();
+};
+const getColumnsNumber = (dataIndex) => ({
+  filterDropdown: ({
+    setSelectedKeys,
+    selectedKeys,
+    confirm,
+    clearFilters,
+    close,
+  }) => {
+    const selectAfter = (
+      <Select
+        style={{
+          width: 78,
+        }}
+        defaultValue=""
+        // ref={myInputNumber}
+        onSelect={(e) => {
+          console.log(`selected values is ${e}`);
+          myInputNumber.current = e;
+          console.log(numericalComparing?.current.value);
+          setSelectedKeys(
+            myInputNumber?.current === "LessThan" &&
+              numericalComparing.current.value !== null
+              ? tableData.filter(
+                  (field) =>
+                    field?.qachange <= numericalComparing?.current.value
+                )
+              : myInputNumber?.current === "GreaterThan" &&
+                numericalComparing.current.value !== null
+              ? tableData.filter(
+                  (field) =>
+                    field?.qachange >= numericalComparing?.current.value
+                )
+              : myInputNumber?.current === "EqualTo" &&
+                numericalComparing.current.value !== null
+              ? tableData.filter(
+                  (field) =>
+                    field?.qachange== numericalComparing?.current.value
+                )
+              : null
+          );
+        }}
+        onChange={(e) => {
+          console.log(`changeSelect ${e}`);
+          console.log(selectedKeys);
+        }}
+      >
+        <option value="">select</option>
+        <option value="LessThan">≤</option>
+        <option value="GreaterThan">≥</option>
+        <option value="EqualTo">=</option>
+      </Select>
+    );
+    return (
+      <>
+        <div
+          style={{
+            padding: 8,
+          }}
+        >
+          <Space direction="vertical">
+            <InputNumber
+              defaultValue={0}
+              ref={numericalComparing}
+              addonAfter={selectAfter}
+              value={numericalComparing?.current?.value}
+              onPressEnter={() =>
+                handleSearchNumber(selectedKeys, confirm, dataIndex)
+              }
+              onChange={(e) => {
+                numericalComparing.current = e;
+                console.log(numericalComparing);
+                // setZeroData(0)
+                setSelectedKeys(
+                  myInputNumber?.current === "LessThan"
+                    ?tableData.filter(
+                        (field) =>
+                          field?.qachange <= numericalComparing?.current
+                      )
+                    : myInputNumber?.current === "GreaterThan"
+                    ? tableData.filter(
+                        (field) =>
+                          field?.qachange >= numericalComparing?.current
+                      )
+                    : myInputNumber?.current === "EqualTo"
+                    ? tableData.filter(
+                        (field) =>
+                          field?.qachange === numericalComparing?.current
+                      )
+                    : numericalComparing === null
+                    ? null
+                    : null
+                );
+                console.log(selectedKeys);
+              }}
+            />
+            <Space>
+              <Button
+                type="link"
+                size="small"
+                onClick={(e) => {
+                  handleSearchNumber(selectedKeys, confirm, dataIndex);
+                }}
+              >
+                Filter
+              </Button>
+              <Button
+                onClick={() => {
+                  clearFilters && handleResetting(clearFilters);
+                }}
+                size="small"
+                style={{
+                  width: 90,
+                }}
+              >
+                Reset
+              </Button>
+              <Button
+                type="link"
+                size="small"
+                style={{
+                  width: 110,
+                }}
+                onClick={() => {
+                  confirm({
+                    closeDropdown: true,
+                  });
+                }}
+              >
+                close
+              </Button>
+            </Space>
+          </Space>
+        </div>
+      </>
+    );
+  },
+  filterIcon: (filtered) => (
+    <SearchOutlined
+      style={{
+        color: filtered ? "#1890ff" : undefined,
+      }}
+    />
+  ),
+  onFilter: (value, record) => {
+    return record?.qachange === value?.qachange;
+  },
+  onFilterDropdownVisibleChange: (visible) => {
+    console.log(visible);
+    if (visible) {
+      setTimeout(() => numericalComparing.current?.select(), 100);
+    }
+  },
+});
+
   const columns = [
     {
       key: "1",
@@ -104,7 +366,9 @@ const HistoryReport = () => {
       responsive: ["xs", "sm", "md", "lg"],
       dataKey: "skuid",
       align: "left",
+      sorter: (a, b) => a.skuid - b.skuid,
       render: (_, record) => <Typography.Text>{record?.skuid}</Typography.Text>,
+      ...getColumnSearchProps('skuid'),
     },
     {
       key: "2",
@@ -112,10 +376,12 @@ const HistoryReport = () => {
       responsive: ["xs", "sm", "md", "lg"],
       dataKey: "description",
       align: "left",
+      sorter: (a, b) => a.description - b.description,
       render: (_, record) => (
         <Typography.Text>{record?.description}</Typography.Text>
       ),
       showOnResponse: true,
+      ...getColumnSearchProps('description'),
     },
     {
       key: "3",
@@ -123,10 +389,13 @@ const HistoryReport = () => {
       responsive: ["xs", "sm", "md", "lg"],
       dataKey: "lotcode",
       align: "left",
+      sorter: (a, b) => a.lotcode - b.lotcode,
       render: (_, record) => (
         <Typography.Text>{record?.lotcode}</Typography.Text>
       ),
       showOnResponse: true,
+      ...getColumnSearchProps('lotcode'),
+
     },
     {
       key: "4",
@@ -134,8 +403,11 @@ const HistoryReport = () => {
       responsive: ["xs", "sm", "md", "lg", "xl"],
       dataKey: "date",
       align: "left",
+      sorter: (a, b) => a.date - b.date,
       render: (_, record) => <Typography.Text>{record?.date}</Typography.Text>,
       showOnResponse: true,
+      // ...getColumnSearchProps('skuid'),
+
     },
     {
       key: "5",
@@ -143,10 +415,13 @@ const HistoryReport = () => {
       responsive: ["xs", "sm", "md", "lg"],
       dataKey: "transaction",
       align: "left",
+      sorter: (a, b) => a.transaction - b.transaction,
       render: (_, record) => (
         <Typography.Text>{record?.transaction}</Typography.Text>
       ),
       showOnResponse: true,
+      ...getColumnSearchProps('transaction'),
+
     },
     {
       key: "6",
@@ -154,10 +429,13 @@ const HistoryReport = () => {
       responsive: ["xs", "sm", "md", "lg"],
       dataKey: "refnumber",
       align: "left",
+      sorter: (a, b) => a.refnumber - b.refnumber,
       render: (_, record) => (
         <Typography.Text>{record?.refnumber}</Typography.Text>
       ),
       showOnResponse: true,
+      ...getColumnSearchProps('refnumber'),
+
     },
     {
       key: "7",
@@ -165,10 +443,13 @@ const HistoryReport = () => {
       responsive: ["xs", "sm", "md", "lg"],
       dataKey: "qachange",
       align: "left",
+      sorter: (a, b) => a.qachange - b.qachange,
       render: (_, record) => (
         <Typography.Text>{record?.qachange}</Typography.Text>
       ),
       showOnResponse: true,
+      ...getColumnsNumber('qachange'),
+
     },
     {
       key: "8",
@@ -176,10 +457,13 @@ const HistoryReport = () => {
       responsive: ["xs", "sm", "md", "lg"],
       dataKey: "inventory",
       align: "left",
+      sorter: (a, b) => a.inventory - b.inventory,
       render: (_, record) => (
         <Typography.Text>{record?.inventory}</Typography.Text>
       ),
       showOnResponse: true,
+      // ...getColumnSearchProps('inventory'),
+
     },
   ];
 
@@ -220,10 +504,9 @@ const HistoryReport = () => {
                     }
                     style={{ width: "100%" }}
                   >
-                    {/* <option value="">Select SKU&apos;s</option> */}
                     {mySKus?.map((ourskus) => {
                       return (
-                        <option value={ourskus?.uniqueid}>{ourskus?.clientname}</option>
+                        <option value={ourskus?.skuid}>{ourskus?.sku1}</option>
                       );
                     })}
                   </Select>
